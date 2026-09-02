@@ -10,27 +10,20 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- jsPDF pour générer des PDF -->
+    <!-- jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f5f5f5;
             color: #333;
             padding-bottom: 80px;
         }
-
-        /* ========== HEADER ========== */
         .app-header {
             background: linear-gradient(135deg, #0066cc, #004d99);
             color: #fff;
-            padding: 15px 20px;
+            padding: 12px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -41,34 +34,27 @@
             flex-wrap: wrap;
             gap: 10px;
         }
-
         .app-header .logo {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
             display: flex;
             align-items: center;
             gap: 10px;
         }
-
-        .app-header .logo i {
-            font-size: 28px;
-        }
-
+        .app-header .logo i { font-size: 26px; }
         .app-header .user-info {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
             flex-wrap: wrap;
         }
-
         .app-header .user-info .email {
             font-size: 13px;
             opacity: 0.9;
         }
-
         .app-header .user-info .avatar {
-            width: 36px;
-            height: 36px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
             background: rgba(255,255,255,0.2);
             display: flex;
@@ -77,35 +63,22 @@
             font-weight: bold;
             font-size: 16px;
         }
-
         .app-header .logout-btn {
             background: rgba(255,255,255,0.15);
             border: 1px solid rgba(255,255,255,0.3);
             color: #fff;
-            padding: 6px 14px;
+            padding: 5px 12px;
             border-radius: 6px;
             cursor: pointer;
             font-size: 13px;
             transition: all 0.3s;
         }
+        .app-header .logout-btn:hover { background: rgba(255,255,255,0.25); }
 
-        .app-header .logout-btn:hover {
-            background: rgba(255,255,255,0.25);
-        }
+        .page { display: none; padding: 15px 20px 100px 20px; max-width: 900px; margin: 0 auto; }
+        .page.active { display: block; }
 
-        /* ========== PAGES ========== */
-        .page {
-            display: none;
-            padding: 15px 20px 100px 20px;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        /* ========== AUTH PAGE ========== */
+        /* AUTH */
         #authPage {
             display: flex;
             justify-content: center;
@@ -116,94 +89,80 @@
             margin: 0;
             max-width: 100%;
         }
-
         #authPage .auth-container {
             background: #fff;
-            padding: 40px 30px;
+            padding: 35px 30px;
             border-radius: 15px;
             width: 100%;
-            max-width: 420px;
+            max-width: 400px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
         }
-
         #authPage .auth-container .auth-icon {
             text-align: center;
-            font-size: 60px;
+            font-size: 50px;
             color: #0066cc;
             margin-bottom: 10px;
         }
-
         #authPage .auth-container h1 {
             text-align: center;
             color: #0066cc;
-            font-size: 28px;
+            font-size: 24px;
             margin-bottom: 5px;
         }
-
         #authPage .auth-container .subtitle {
             text-align: center;
             color: #666;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             font-size: 14px;
         }
-
-        #authPage .auth-container .form-group {
-            margin-bottom: 15px;
-        }
-
-        #authPage .auth-container label {
+        .form-group { margin-bottom: 14px; }
+        .form-group label {
             display: block;
             font-size: 14px;
             color: #555;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             font-weight: 500;
         }
-
-        #authPage .auth-container input {
+        .form-group input, .form-group select, .form-group textarea {
             width: 100%;
-            padding: 12px 15px;
+            padding: 10px 14px;
             border: 1px solid #ddd;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 15px;
             transition: border 0.3s;
+            font-family: inherit;
         }
-
-        #authPage .auth-container input:focus {
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
             border-color: #0066cc;
             outline: none;
         }
-
-        #authPage .auth-container .btn-primary {
+        .btn-primary {
             width: 100%;
-            padding: 14px;
+            padding: 12px;
             background: #0066cc;
             color: #fff;
             border: none;
             border-radius: 8px;
-            font-size: 18px;
+            font-size: 17px;
             font-weight: bold;
             cursor: pointer;
             transition: background 0.3s;
-            margin-top: 10px;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
-
-        #authPage .auth-container .btn-primary:hover {
-            background: #0052a3;
-        }
-
-        #authPage .auth-container .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        #authPage .auth-container .btn-google {
+        .btn-primary:hover { background: #0052a3; }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-google {
             width: 100%;
-            padding: 12px;
+            padding: 11px;
             background: #fff;
             color: #333;
             border: 2px solid #ddd;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
@@ -211,114 +170,48 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            margin-top: 10px;
+            margin-top: 8px;
         }
-
-        #authPage .auth-container .btn-google:hover {
-            border-color: #0066cc;
-            background: #f8f9fa;
-        }
-
-        #authPage .auth-container .btn-google img {
-            width: 20px;
-            height: 20px;
-        }
-
-        #authPage .auth-container .divider {
+        .btn-google:hover { border-color: #0066cc; background: #f8f9fa; }
+        .divider {
             display: flex;
             align-items: center;
-            margin: 20px 0;
+            margin: 15px 0;
             color: #999;
             font-size: 13px;
         }
-
-        #authPage .auth-container .divider::before,
-        #authPage .auth-container .divider::after {
+        .divider::before, .divider::after {
             content: '';
             flex: 1;
             height: 1px;
             background: #ddd;
         }
+        .divider span { padding: 0 15px; }
+        .auth-switch { text-align: center; margin-top: 12px; font-size: 14px; color: #666; }
+        .auth-switch a { color: #0066cc; cursor: pointer; font-weight: 600; }
+        .auth-switch a:hover { text-decoration: underline; }
+        .error-msg { color: #f44336; font-size: 13px; text-align: center; margin-top: 10px; display: none; }
 
-        #authPage .auth-container .divider span {
-            padding: 0 15px;
-        }
-
-        #authPage .auth-container .auth-switch {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 14px;
-            color: #666;
-        }
-
-        #authPage .auth-container .auth-switch a {
-            color: #0066cc;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        #authPage .auth-container .auth-switch a:hover {
-            text-decoration: underline;
-        }
-
-        #authPage .auth-container .error-msg {
-            color: #f44336;
-            font-size: 13px;
-            text-align: center;
-            margin-top: 10px;
-            display: none;
-        }
-
-        /* ========== HOME PAGE ========== */
-        .add-btn {
-            background: #0066cc;
-            color: #fff;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: background 0.3s;
-        }
-
-        .add-btn:hover {
-            background: #0052a3;
-        }
-
-        .madrassa-card {
+        /* CARDS */
+        .madrassa-card, .student-card, .diploma-card, .convocation-card {
             background: #fff;
             border-radius: 12px;
-            padding: 18px;
-            margin-bottom: 15px;
+            padding: 16px;
+            margin-bottom: 14px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s;
         }
+        .madrassa-card { cursor: pointer; }
+        .madrassa-card:hover, .student-card:hover { transform: translateY(-2px); }
+        .student-card { cursor: pointer; }
 
-        .madrassa-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-        }
-
-        .madrassa-card .card-header {
+        .madrassa-card .card-header, .student-card .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 8px;
         }
-
-        .madrassa-card .card-header h3 {
-            font-size: 18px;
-            color: #333;
-        }
-
+        .madrassa-card .card-header h3 { font-size: 18px; color: #333; }
         .madrassa-card .card-header .distance {
             background: #e6f2ff;
             color: #0066cc;
@@ -327,27 +220,178 @@
             font-size: 12px;
             font-weight: 500;
         }
-
-        .madrassa-card .card-body {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .madrassa-card .card-body .info-row {
+        .info-row {
             display: flex;
             align-items: center;
             gap: 8px;
             color: #666;
             font-size: 14px;
+            margin: 3px 0;
+        }
+        .info-row i { width: 18px; color: #0066cc; }
+
+        .student-card .avatar {
+            width: 45px;
+            height: 45px;
+            background: #0066cc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .student-card .info { flex: 1; margin-left: 12px; }
+        .student-card .info .name { font-size: 16px; font-weight: bold; color: #333; }
+        .student-card .info .code { font-size: 12px; color: #666; }
+        .student-card .info .level { font-size: 12px; color: #0066cc; }
+        .student-card .status {
+            padding: 3px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #fff;
+        }
+        .student-card .status.accepted { background: #4CAF50; }
+        .student-card .status.pending { background: #FF9800; }
+        .student-card .status.rejected { background: #f44336; }
+        .student-card .card-body {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #f0f0f0;
+        }
+        .student-card .card-body .stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
+            color: #666;
+        }
+        .student-card .card-body .stat i { color: #0066cc; }
+        .student-card .qualities {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #f0f0f0;
+        }
+        .student-card .qualities .badge {
+            background: #e6f2ff;
+            color: #0066cc;
+            padding: 2px 12px;
+            border-radius: 12px;
+            font-size: 12px;
         }
 
-        .madrassa-card .card-body .info-row i {
-            width: 18px;
+        /* DETAIL */
+        .detail-header, .detail-section {
+            background: #fff;
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 14px;
+        }
+        .detail-header h2 { font-size: 22px; color: #333; }
+        .detail-header .location {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            margin-top: 4px;
+            font-size: 14px;
+        }
+        .detail-header .location i { color: #0066cc; }
+        .detail-section h4 {
+            font-size: 17px;
+            color: #333;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 8px;
+        }
+        .detail-section .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .detail-section .info-grid .info-item {
+            text-align: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .detail-section .info-grid .info-item i {
+            font-size: 18px;
+            color: #0066cc;
+            display: block;
+            margin-bottom: 3px;
+        }
+        .detail-section .info-grid .info-item .label { font-size: 11px; color: #999; }
+        .detail-section .info-grid .info-item .value { font-size: 14px; font-weight: 500; color: #333; }
+        .detail-section .rule-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 4px 0;
+            color: #444;
+            font-size: 14px;
+        }
+        .detail-section .rule-item i { color: #0066cc; }
+        .detail-section .fees-container {
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+        }
+        .detail-section .fees-container .fee-item { text-align: center; }
+        .detail-section .fees-container .fee-item .label { font-size: 12px; color: #999; }
+        .detail-section .fees-container .fee-item .value {
+            font-size: 15px;
+            font-weight: bold;
             color: #0066cc;
         }
+        .course-badge {
+            display: inline-block;
+            background: #e6f2ff;
+            color: #0066cc;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            margin: 3px 5px 3px 0;
+        }
+        .teacher-item, .alumni-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .teacher-item .name, .alumni-item .name { flex: 1; font-size: 14px; color: #333; }
+        .teacher-item .subject, .alumni-item .achievement { font-size: 12px; color: #666; }
+        .teacher-item i, .alumni-item i { color: #0066cc; }
+        .alumni-item i { color: #ffd700; }
 
-        .madrassa-card .manage-btn {
+        .inscription-btn, .add-btn, .diploma-btn {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: background 0.3s;
+        }
+        .inscription-btn, .add-btn { background: #0066cc; color: #fff; }
+        .inscription-btn:hover, .add-btn:hover { background: #0052a3; }
+        .diploma-btn { background: #ffd700; color: #333; margin-bottom: 8px; }
+        .diploma-btn:hover { background: #e6c200; }
+        .manage-btn {
             background: #0066cc;
             color: #fff;
             border: none;
@@ -359,401 +403,23 @@
             font-weight: bold;
             font-size: 14px;
         }
+        .manage-btn:hover { background: #0052a3; }
 
-        .madrassa-card .manage-btn:hover {
-            background: #0052a3;
-        }
-
-        /* ========== DETAIL PAGE ========== */
-        .detail-header {
-            background: #fff;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-        }
-
-        .detail-header h2 {
-            font-size: 24px;
-            color: #333;
-        }
-
-        .detail-header .location {
+        .back-btn {
+            background: none;
+            border: none;
+            color: #0066cc;
+            font-size: 16px;
+            cursor: pointer;
             display: flex;
             align-items: center;
             gap: 8px;
-            color: #666;
-            margin-top: 5px;
-            font-size: 14px;
-        }
-
-        .detail-header .location i {
-            color: #0066cc;
-        }
-
-        .detail-section {
-            background: #fff;
-            padding: 18px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-        }
-
-        .detail-section h4 {
-            font-size: 17px;
-            color: #333;
-            margin-bottom: 12px;
-            border-bottom: 2px solid #f0f0f0;
-            padding-bottom: 10px;
-        }
-
-        .detail-section .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .detail-section .info-grid .info-item {
-            text-align: center;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
-
-        .detail-section .info-grid .info-item i {
-            font-size: 20px;
-            color: #0066cc;
-            display: block;
-            margin-bottom: 4px;
-        }
-
-        .detail-section .info-grid .info-item .label {
-            font-size: 11px;
-            color: #999;
-        }
-
-        .detail-section .info-grid .info-item .value {
-            font-size: 14px;
-            font-weight: 500;
-            color: #333;
-        }
-
-        .detail-section .rule-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 6px 0;
-            color: #444;
-            font-size: 14px;
-        }
-
-        .detail-section .rule-item i {
-            color: #0066cc;
-        }
-
-        .detail-section .fees-container {
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-        }
-
-        .detail-section .fees-container .fee-item {
-            text-align: center;
-        }
-
-        .detail-section .fees-container .fee-item .label {
-            font-size: 12px;
-            color: #999;
-        }
-
-        .detail-section .fees-container .fee-item .value {
-            font-size: 16px;
-            font-weight: bold;
-            color: #0066cc;
-        }
-
-        .detail-section .course-badge {
-            display: inline-block;
-            background: #e6f2ff;
-            color: #0066cc;
-            padding: 4px 14px;
-            border-radius: 20px;
-            font-size: 13px;
-            margin: 3px 5px 3px 0;
-        }
-
-        .detail-section .teacher-item,
-        .detail-section .alumni-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
             padding: 8px 0;
-            border-bottom: 1px solid #f0f0f0;
+            margin-bottom: 8px;
         }
+        .back-btn:hover { color: #0052a3; }
 
-        .detail-section .teacher-item .name,
-        .detail-section .alumni-item .name {
-            flex: 1;
-            font-size: 14px;
-            color: #333;
-        }
-
-        .detail-section .teacher-item .subject,
-        .detail-section .alumni-item .achievement {
-            font-size: 12px;
-            color: #666;
-        }
-
-        .detail-section .teacher-item i,
-        .detail-section .alumni-item i {
-            color: #0066cc;
-        }
-
-        .detail-section .alumni-item i {
-            color: #ffd700;
-        }
-
-        .inscription-btn {
-            background: #0066cc;
-            color: #fff;
-            border: none;
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
-            transition: background 0.3s;
-        }
-
-        .inscription-btn:hover {
-            background: #0052a3;
-        }
-
-        /* ========== INSCRIPTION PAGE ========== */
-        .form-section {
-            background: #fff;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-        }
-
-        .form-section h4 {
-            font-size: 17px;
-            color: #333;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #f0f0f0;
-            padding-bottom: 10px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 14px;
-            color: #555;
-            margin-bottom: 5px;
-            font-weight: 500;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 10px 14px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 15px;
-            transition: border 0.3s;
-            font-family: inherit;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            border-color: #0066cc;
-            outline: none;
-        }
-
-        .form-group .radio-group {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .form-group .radio-group label {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-weight: normal;
-            cursor: pointer;
-            padding: 8px 14px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            transition: all 0.3s;
-        }
-
-        .form-group .radio-group label:hover {
-            background: #f0f7ff;
-        }
-
-        .form-group .radio-group input[type="radio"] {
-            width: auto;
-            accent-color: #0066cc;
-        }
-
-        .form-group .radio-group label:has(input:checked) {
-            border-color: #0066cc;
-            background: #e6f2ff;
-        }
-
-        .form-group .terms {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .form-group .terms input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            accent-color: #0066cc;
-        }
-
-        .form-group .terms label {
-            margin-bottom: 0;
-            font-weight: normal;
-            font-size: 14px;
-        }
-
-        /* ========== DASHBOARD PAGE ========== */
-        .dashboard-header {
-            background: #fff;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .dashboard-header h2 {
-            font-size: 22px;
-            color: #333;
-        }
-
-        .dashboard-header p {
-            color: #666;
-            margin-top: 4px;
-        }
-
-        .student-card {
-            background: #fff;
-            border-radius: 12px;
-            padding: 18px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .student-card:hover {
-            transform: translateY(-2px);
-        }
-
-        .student-card .card-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-
-        .student-card .avatar {
-            width: 50px;
-            height: 50px;
-            background: #0066cc;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-weight: bold;
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-
-        .student-card .card-header .info {
-            flex: 1;
-        }
-
-        .student-card .card-header .info .name {
-            font-size: 16px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .student-card .card-header .info .code {
-            font-size: 12px;
-            color: #666;
-        }
-
-        .student-card .card-header .info .level {
-            font-size: 12px;
-            color: #0066cc;
-        }
-
-        .student-card .card-header .status {
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: bold;
-            color: #fff;
-        }
-
-        .student-card .card-header .status.accepted { background: #4CAF50; }
-        .student-card .card-header .status.pending { background: #FF9800; }
-        .student-card .card-header .status.rejected { background: #f44336; }
-
-        .student-card .card-body {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            padding-top: 10px;
-            border-top: 1px solid #f0f0f0;
-        }
-
-        .student-card .card-body .stat {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 13px;
-            color: #666;
-        }
-
-        .student-card .card-body .stat i {
-            color: #0066cc;
-        }
-
-        .student-card .qualities {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid #f0f0f0;
-        }
-
-        .student-card .qualities .badge {
-            background: #e6f2ff;
-            color: #0066cc;
-            padding: 2px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-        }
-
-        /* ========== BOTTOM NAV ========== */
+        /* BOTTOM NAV */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -765,10 +431,9 @@
             box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
             z-index: 100;
         }
-
         .bottom-nav .nav-item {
             flex: 1;
-            padding: 10px 0;
+            padding: 8px 0;
             text-align: center;
             cursor: pointer;
             transition: color 0.3s;
@@ -777,22 +442,11 @@
             background: none;
             font-size: 11px;
         }
+        .bottom-nav .nav-item i { font-size: 20px; display: block; margin-bottom: 2px; }
+        .bottom-nav .nav-item.active { color: #0066cc; }
+        .bottom-nav .nav-item:hover { color: #0066cc; }
 
-        .bottom-nav .nav-item i {
-            font-size: 22px;
-            display: block;
-            margin-bottom: 2px;
-        }
-
-        .bottom-nav .nav-item.active {
-            color: #0066cc;
-        }
-
-        .bottom-nav .nav-item:hover {
-            color: #0066cc;
-        }
-
-        /* ========== MODAL ========== */
+        /* MODAL */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -806,11 +460,7 @@
             align-items: center;
             padding: 20px;
         }
-
-        .modal-overlay.show {
-            display: flex;
-        }
-
+        .modal-overlay.show { display: flex; }
         .modal-overlay .modal-content {
             background: #fff;
             border-radius: 16px;
@@ -820,172 +470,116 @@
             max-height: 90vh;
             overflow-y: auto;
         }
-
         .modal-overlay .modal-content h3 {
             font-size: 20px;
             color: #333;
             text-align: center;
             margin-bottom: 5px;
         }
-
         .modal-overlay .modal-content .subtitle {
             text-align: center;
             color: #666;
             font-size: 14px;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
-
-        .modal-overlay .modal-content .quality-option {
+        .quality-option {
             display: inline-block;
-            padding: 8px 18px;
+            padding: 6px 16px;
             border: 1px solid #ddd;
             border-radius: 20px;
-            margin: 4px;
+            margin: 3px;
             cursor: pointer;
             transition: all 0.3s;
             font-size: 13px;
             background: #fff;
             color: #666;
         }
-
-        .modal-overlay .modal-content .quality-option.selected {
-            background: #0066cc;
-            color: #fff;
-            border-color: #0066cc;
-        }
-
-        .modal-overlay .modal-content .quality-option:hover {
-            border-color: #0066cc;
-        }
-
-        .modal-overlay .modal-content .modal-buttons {
+        .quality-option.selected { background: #0066cc; color: #fff; border-color: #0066cc; }
+        .quality-option:hover { border-color: #0066cc; }
+        .modal-buttons {
             display: flex;
             gap: 10px;
-            margin-top: 20px;
+            margin-top: 18px;
         }
-
-        .modal-overlay .modal-content .modal-buttons button {
+        .modal-buttons button {
             flex: 1;
-            padding: 12px;
+            padding: 11px;
             border: none;
             border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
             font-size: 15px;
         }
-
-        .modal-overlay .modal-content .modal-buttons .btn-cancel {
-            background: #f44336;
-            color: #fff;
-        }
-
-        .modal-overlay .modal-content .modal-buttons .btn-save {
-            background: #4CAF50;
-            color: #fff;
-        }
-
-        .modal-overlay .modal-content .modal-buttons .btn-close {
-            background: #999;
-            color: #fff;
-            flex: 0.5;
-        }
-
-        .modal-overlay .modal-content .payment-option {
+        .modal-buttons .btn-cancel { background: #f44336; color: #fff; }
+        .modal-buttons .btn-save { background: #4CAF50; color: #fff; }
+        .modal-buttons .btn-close { background: #999; color: #fff; flex: 0.5; }
+        .payment-option {
             display: block;
             width: 100%;
-            padding: 14px;
+            padding: 12px;
             border: 1px solid #ddd;
             border-radius: 8px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             cursor: pointer;
             text-align: left;
-            font-size: 16px;
+            font-size: 15px;
             background: #fff;
             transition: all 0.3s;
         }
+        .payment-option:hover { border-color: #0066cc; }
+        .payment-option.selected { border-color: #0066cc; background: #e6f2ff; color: #0066cc; }
 
-        .modal-overlay .modal-content .payment-option:hover {
-            border-color: #0066cc;
-        }
-
-        .modal-overlay .modal-content .payment-option.selected {
-            border-color: #0066cc;
-            background: #e6f2ff;
-            color: #0066cc;
-        }
-
-        /* ========== EMPTY STATE ========== */
+        /* EMPTY STATE */
         .empty-state {
             text-align: center;
-            padding: 50px 20px;
+            padding: 40px 20px;
             color: #999;
         }
-
-        .empty-state i {
-            font-size: 64px;
-            color: #ddd;
-            margin-bottom: 15px;
-        }
-
-        .empty-state p {
-            font-size: 16px;
-        }
-
+        .empty-state i { font-size: 56px; color: #ddd; margin-bottom: 12px; }
+        .empty-state p { font-size: 16px; }
         .empty-state .btn-secondary {
             background: #0066cc;
             color: #fff;
             border: none;
             padding: 10px 25px;
             border-radius: 8px;
-            margin-top: 15px;
+            margin-top: 12px;
             cursor: pointer;
             font-size: 15px;
         }
 
-        /* ========== STUDENT DETAIL ========== */
+        /* STUDENT DETAIL */
         .student-detail-header {
             background: #fff;
-            padding: 25px;
+            padding: 22px;
             border-radius: 12px;
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 14px;
         }
-
         .student-detail-header .big-avatar {
-            width: 80px;
-            height: 80px;
+            width: 70px;
+            height: 70px;
             background: #0066cc;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #fff;
-            font-size: 32px;
+            font-size: 28px;
             font-weight: bold;
-            margin: 0 auto 10px;
+            margin: 0 auto 8px;
         }
-
-        .student-detail-header .name {
-            font-size: 22px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .student-detail-header .code {
-            color: #666;
-            font-size: 14px;
-        }
-
+        .student-detail-header .name { font-size: 20px; font-weight: bold; color: #333; }
+        .student-detail-header .code { color: #666; font-size: 14px; }
         .student-detail-header .status {
             display: inline-block;
-            padding: 4px 16px;
+            padding: 3px 14px;
             border-radius: 12px;
             font-size: 13px;
             font-weight: bold;
             color: #fff;
-            margin-top: 8px;
+            margin-top: 6px;
         }
-
         .student-detail-header .status.accepted { background: #4CAF50; }
         .student-detail-header .status.pending { background: #FF9800; }
         .student-detail-header .status.rejected { background: #f44336; }
@@ -993,240 +587,44 @@
         .detail-row {
             display: flex;
             align-items: center;
-            padding: 10px 0;
+            padding: 8px 0;
             border-bottom: 1px solid #f0f0f0;
             gap: 10px;
         }
+        .detail-row i { color: #0066cc; width: 20px; }
+        .detail-row .label { color: #555; font-size: 14px; flex: 1; }
+        .detail-row .value { color: #333; font-size: 14px; font-weight: 500; }
+        .clickable-row { cursor: pointer; transition: background 0.2s; }
+        .clickable-row:hover { background: #f8f9fa; }
+        .clickable-row .arrow { color: #999; }
 
-        .detail-row i {
-            color: #0066cc;
-            width: 20px;
-        }
-
-        .detail-row .label {
-            color: #555;
-            font-size: 14px;
-            flex: 1;
-        }
-
-        .detail-row .value {
-            color: #333;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .clickable-row {
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .clickable-row:hover {
-            background: #f8f9fa;
-        }
-
-        .clickable-row .arrow {
-            color: #999;
-        }
-
-        .diploma-btn {
-            width: 100%;
-            padding: 14px;
-            background: #0066cc;
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-bottom: 10px;
+        /* FILTER */
+        .filter-container {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: background 0.3s;
+            gap: 8px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
         }
-
-        .diploma-btn:hover {
-            background: #0052a3;
-        }
-
-        .diploma-btn.gold {
-            background: #ffd700;
-            color: #333;
-        }
-
-        .diploma-btn.gold:hover {
-            background: #e6c200;
-        }
-
-        /* ========== DIPLOMA CARD ========== */
-        .diploma-card {
+        .filter-btn {
+            padding: 6px 14px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
             background: #fff;
-            border-radius: 12px;
-            padding: 18px;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-        }
-
-        .diploma-card .icon {
-            width: 60px;
-            height: 60px;
-            background: #fff8e1;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 30px;
-            color: #ffd700;
-        }
-
-        .diploma-card .info {
-            flex: 1;
-        }
-
-        .diploma-card .info .name {
-            font-size: 16px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .diploma-card .info .student {
-            font-size: 14px;
-            color: #666;
-        }
-
-        .diploma-card .info .date {
-            font-size: 12px;
-            color: #999;
-        }
-
-        .diploma-card .badge {
-            width: 30px;
-            height: 30px;
-            background: #4CAF50;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-weight: bold;
-        }
-
-        /* ========== CONVOCATION CARD ========== */
-        .convocation-card {
-            background: #fff;
-            border-radius: 12px;
-            padding: 18px;
-            margin-bottom: 12px;
-            display: flex;
-            gap: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-        }
-
-        .convocation-card .icon {
-            width: 50px;
-            height: 50px;
-            background: #e6f2ff;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: #0066cc;
-            flex-shrink: 0;
-        }
-
-        .convocation-card .info {
-            flex: 1;
-        }
-
-        .convocation-card .info .title {
-            font-size: 16px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .convocation-card .info .student {
-            font-size: 14px;
-            color: #666;
-        }
-
-        .convocation-card .info .details {
-            display: flex;
-            gap: 15px;
-            margin: 5px 0;
-        }
-
-        .convocation-card .info .details span {
-            font-size: 12px;
-            color: #666;
-        }
-
-        .convocation-card .info .description {
+            cursor: pointer;
             font-size: 13px;
-            color: #444;
-            margin-top: 4px;
+            transition: all 0.3s;
+            color: #666;
         }
+        .filter-btn:hover { border-color: #0066cc; }
+        .filter-btn.active { background: #0066cc; color: #fff; border-color: #0066cc; }
 
-        /* ========== RESPONSIVE ========== */
-        @media (max-width: 480px) {
-            .app-header .logo {
-                font-size: 16px;
-            }
-            .app-header .user-info .email {
-                font-size: 11px;
-            }
-            .detail-section .info-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-            .form-group .radio-group {
-                flex-wrap: wrap;
-            }
-            #authPage .auth-container {
-                padding: 25px 20px;
-            }
-        }
-
-        /* ========== SPINNER ========== */
-        .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loading-center {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 50px;
-        }
-
-        .loading-center .spinner {
-            width: 40px;
-            height: 40px;
-            border-width: 4px;
-            border-color: rgba(0,102,204,0.2);
-            border-top-color: #0066cc;
-        }
-
-        /* Toast notification */
+        /* TOAST */
         .toast {
             position: fixed;
-            top: 80px;
+            top: 70px;
             left: 50%;
             transform: translateX(-50%);
-            padding: 12px 24px;
+            padding: 10px 22px;
             border-radius: 8px;
             color: #fff;
             font-weight: bold;
@@ -1235,118 +633,122 @@
             max-width: 90%;
             text-align: center;
         }
-
-        .toast.success {
-            background: #4CAF50;
-        }
-        .toast.error {
-            background: #f44336;
-        }
-        .toast.info {
-            background: #2196F3;
-        }
-        .toast.show {
-            display: block;
-            animation: slideDown 0.3s ease;
-        }
-
+        .toast.success { background: #4CAF50; }
+        .toast.error { background: #f44336; }
+        .toast.info { background: #2196F3; }
+        .toast.show { display: block; animation: slideDown 0.3s ease; }
         @keyframes slideDown {
             from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
             to { transform: translateX(-50%) translateY(0); opacity: 1; }
         }
 
-        .hidden {
-            display: none !important;
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
         }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        .back-btn {
-            background: none;
-            border: none;
-            color: #0066cc;
-            font-size: 16px;
-            cursor: pointer;
+        .radio-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .radio-group label {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 10px 0;
-            margin-bottom: 10px;
+            gap: 6px;
+            font-weight: normal;
+            cursor: pointer;
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            transition: all 0.3s;
         }
+        .radio-group label:hover { background: #f0f7ff; }
+        .radio-group input[type="radio"] { width: auto; accent-color: #0066cc; }
+        .radio-group label:has(input:checked) { border-color: #0066cc; background: #e6f2ff; }
+        .terms { display: flex; align-items: center; gap: 10px; }
+        .terms input[type="checkbox"] { width: 18px; height: 18px; accent-color: #0066cc; }
+        .terms label { margin-bottom: 0; font-weight: normal; font-size: 14px; }
 
-        .back-btn:hover {
-            color: #0052a3;
+        .form-section {
+            background: #fff;
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 14px;
         }
-
-        .section-title {
-            font-size: 18px;
-            font-weight: bold;
+        .form-section h4 {
+            font-size: 17px;
             color: #333;
             margin-bottom: 12px;
             border-bottom: 2px solid #f0f0f0;
-            padding-bottom: 10px;
+            padding-bottom: 8px;
         }
 
-        /* Filter buttons */
-        .filter-container {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-
-        .filter-btn {
-            padding: 8px 16px;
-            border: 1px solid #ddd;
-            border-radius: 20px;
+        .dashboard-header {
             background: #fff;
-            cursor: pointer;
-            font-size: 13px;
-            transition: all 0.3s;
-            color: #666;
-        }
-
-        .filter-btn:hover {
-            border-color: #0066cc;
-        }
-
-        .filter-btn.active {
-            background: #0066cc;
-            color: #fff;
-            border-color: #0066cc;
-        }
-
-        /* PDF Preview */
-        .pdf-preview {
-            background: #f8f9fa;
-            border: 2px dashed #ddd;
+            padding: 18px;
             border-radius: 12px;
-            padding: 20px;
+            margin-bottom: 14px;
             text-align: center;
-            margin: 15px 0;
         }
+        .dashboard-header h2 { font-size: 20px; color: #333; }
+        .dashboard-header p { color: #666; margin-top: 3px; }
 
-        .pdf-preview i {
-            font-size: 48px;
+        .diploma-card .icon {
+            width: 50px;
+            height: 50px;
+            background: #fff8e1;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            color: #ffd700;
+            flex-shrink: 0;
+        }
+        .diploma-card .info { flex: 1; margin-left: 12px; }
+        .diploma-card .info .name { font-size: 15px; font-weight: bold; color: #333; }
+        .diploma-card .info .student { font-size: 13px; color: #666; }
+        .diploma-card .info .date { font-size: 12px; color: #999; }
+        .convocation-card .icon {
+            width: 45px;
+            height: 45px;
+            background: #e6f2ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
             color: #0066cc;
-            margin-bottom: 10px;
+            flex-shrink: 0;
+        }
+        .convocation-card .info { flex: 1; margin-left: 12px; }
+        .convocation-card .info .title { font-size: 15px; font-weight: bold; color: #333; }
+        .convocation-card .info .student { font-size: 13px; color: #666; }
+        .convocation-card .info .details {
+            display: flex;
+            gap: 12px;
+            margin: 4px 0;
+        }
+        .convocation-card .info .details span { font-size: 12px; color: #666; }
+        .convocation-card .info .description { font-size: 13px; color: #444; margin-top: 3px; }
+        .diploma-card, .convocation-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .pdf-preview p {
-            color: #666;
-        }
-
-        .pdf-preview .download-btn {
-            background: #0066cc;
-            color: #fff;
-            border: none;
-            padding: 10px 25px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 15px;
-            margin-top: 10px;
-        }
-
-        .pdf-preview .download-btn:hover {
-            background: #0052a3;
+        @media (max-width: 480px) {
+            .app-header .logo { font-size: 15px; }
+            .app-header .user-info .email { font-size: 11px; }
+            .detail-section .info-grid { grid-template-columns: 1fr 1fr; }
+            #authPage .auth-container { padding: 25px 18px; }
         }
     </style>
 </head>
@@ -1373,9 +775,7 @@
     <!-- ==================== AUTH PAGE ==================== -->
     <div id="authPage" class="page active">
         <div class="auth-container">
-            <div class="auth-icon">
-                <i class="fas fa-school"></i>
-            </div>
+            <div class="auth-icon"><i class="fas fa-school"></i></div>
             <h1>Madrassa App</h1>
             <p class="subtitle">Gestion des inscriptions et diplômes coraniques</p>
 
@@ -1392,9 +792,7 @@
                     <i class="fas fa-sign-in-alt"></i> Se connecter
                 </button>
 
-                <div class="divider">
-                    <span>OU</span>
-                </div>
+                <div class="divider"><span>OU</span></div>
 
                 <button class="btn-google" onclick="handleGoogleLogin()">
                     <i class="fab fa-google"></i> Continuer avec Google
@@ -1418,17 +816,13 @@
 
     <!-- ==================== DETAIL PAGE ==================== -->
     <div id="detailPage" class="page">
-        <button class="back-btn" onclick="showPage('homePage')">
-            <i class="fas fa-arrow-left"></i> Retour
-        </button>
+        <button class="back-btn" onclick="showPage('homePage')"><i class="fas fa-arrow-left"></i> Retour</button>
         <div id="madrassaDetail"></div>
     </div>
 
     <!-- ==================== INSCRIPTION PAGE ==================== -->
     <div id="inscriptionPage" class="page">
-        <button class="back-btn" onclick="showPage('detailPage')">
-            <i class="fas fa-arrow-left"></i> Retour
-        </button>
+        <button class="back-btn" onclick="showPage('detailPage')"><i class="fas fa-arrow-left"></i> Retour</button>
         <div id="inscriptionForm"></div>
     </div>
 
@@ -1461,17 +855,13 @@
 
     <!-- ==================== STUDENT DETAIL PAGE ==================== -->
     <div id="studentDetailPage" class="page">
-        <button class="back-btn" onclick="showPage('dashboardPage')">
-            <i class="fas fa-arrow-left"></i> Retour
-        </button>
+        <button class="back-btn" onclick="showPage('dashboardPage')"><i class="fas fa-arrow-left"></i> Retour</button>
         <div id="studentDetail"></div>
     </div>
 
     <!-- ==================== ADD MADRASSA PAGE ==================== -->
     <div id="addMadrassaPage" class="page">
-        <button class="back-btn" onclick="showPage('homePage')">
-            <i class="fas fa-arrow-left"></i> Retour
-        </button>
+        <button class="back-btn" onclick="showPage('homePage')"><i class="fas fa-arrow-left"></i> Retour</button>
         <div class="form-section">
             <h4><i class="fas fa-plus-circle"></i> Ajouter une madrassa</h4>
             <form id="addMadrassaForm" onsubmit="event.preventDefault(); handleAddMadrassa();">
@@ -1540,9 +930,7 @@
 
     <!-- ==================== STUDENT MANAGEMENT PAGE ==================== -->
     <div id="studentManagementPage" class="page">
-        <button class="back-btn" onclick="showPage('homePage')">
-            <i class="fas fa-arrow-left"></i> Retour
-        </button>
+        <button class="back-btn" onclick="showPage('homePage')"><i class="fas fa-arrow-left"></i> Retour</button>
         <div class="filter-container" id="filterContainer">
             <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">Tous</button>
             <button class="filter-btn" data-filter="pending" onclick="setFilter('pending')">En attente</button>
@@ -1569,21 +957,19 @@
 
     <!-- ==================== MODAL ==================== -->
     <div class="modal-overlay" id="modalOverlay">
-        <div class="modal-content" id="modalContent">
-            <!-- Dynamic content -->
-        </div>
+        <div class="modal-content" id="modalContent"></div>
     </div>
 
     <!-- ==================== SCRIPTS ==================== -->
     <script>
-        // ==================== FIREBASE CONFIG ====================
+        // ==================== FIREBASE CONFIG (CORRECTE) ====================
         const firebaseConfig = {
-            apiKey: "AIzaSyBi57H0lwyCs1hhfd165n3jluaaaF5b5Fc",
+            apiKey: "AIzaSyDPgj4JhIuOCyQfHRkjZEj4C8IUZEg380s",
             authDomain: "madarassa-a2bab.firebaseapp.com",
             projectId: "madarassa-a2bab",
             storageBucket: "madarassa-a2bab.firebasestorage.app",
             messagingSenderId: "364377537370",
-            appId: "1:364377537370:android:82042ee3a2596db27a9163"
+            appId: "1:364377537370:web:934129f2a9d084687a9163"
         };
 
         firebase.initializeApp(firebaseConfig);
@@ -1606,9 +992,7 @@
             toast.textContent = message;
             toast.className = 'toast ' + type + ' show';
             clearTimeout(toast._timeout);
-            toast._timeout = setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
+            toast._timeout = setTimeout(() => { toast.classList.remove('show'); }, 3000);
         }
 
         function showPage(pageId) {
@@ -1619,13 +1003,11 @@
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.querySelectorAll('.nav-item[data-page="' + pageId + '"]').forEach(n => n.classList.add('active'));
 
-            // Refresh data when showing pages
             if (pageId === 'homePage') renderMadrassas();
             if (pageId === 'dashboardPage') renderDashboard();
             if (pageId === 'diplomesPage') renderDiplomes();
             if (pageId === 'convocationsPage') renderConvocations();
 
-            // Hide header on auth page
             document.getElementById('appHeader').style.display = pageId === 'authPage' ? 'none' : 'flex';
             document.getElementById('bottomNav').style.display = pageId === 'authPage' ? 'none' : 'flex';
         }
@@ -1641,15 +1023,6 @@
             if (!date) return 'N/A';
             const d = date.toDate ? date.toDate() : new Date(date);
             return d.toLocaleDateString('fr-FR');
-        }
-
-        function getStatusColor(status) {
-            switch (status) {
-                case 'accepted': return '#4CAF50';
-                case 'pending': return '#FF9800';
-                case 'rejected': return '#f44336';
-                default: return '#999';
-            }
         }
 
         function getStatusText(status) {
@@ -1685,18 +1058,15 @@
         function toggleAuthMode() {
             isSignUp = !isSignUp;
             const btn = document.getElementById('loginBtn');
-            const switchText = document.querySelector('.auth-switch a');
             const errorEl = document.getElementById('authError');
             errorEl.style.display = 'none';
 
             if (isSignUp) {
                 btn.innerHTML = '<i class="fas fa-user-plus"></i> S\'inscrire';
-                switchText.textContent = 'Se connecter';
                 document.querySelector('.auth-switch').innerHTML =
                     'Déjà un compte ? <a onclick="toggleAuthMode()">Se connecter</a>';
             } else {
                 btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Se connecter';
-                switchText.textContent = 'S\'inscrire';
                 document.querySelector('.auth-switch').innerHTML =
                     'Pas encore de compte ? <a onclick="toggleAuthMode()">S\'inscrire</a>';
             }
@@ -1734,9 +1104,14 @@
                 showPage('homePage');
 
             } catch (error) {
-                errorEl.textContent = error.message;
+                let msg = error.message;
+                if (error.code === 'auth/user-not-found') msg = 'Email non trouvé';
+                else if (error.code === 'auth/wrong-password') msg = 'Mot de passe incorrect';
+                else if (error.code === 'auth/email-already-in-use') msg = 'Email déjà utilisé';
+                else if (error.code === 'auth/weak-password') msg = 'Mot de passe trop faible';
+                errorEl.textContent = msg;
                 errorEl.style.display = 'block';
-                showToast('Erreur: ' + error.message, 'error');
+                showToast('Erreur: ' + msg, 'error');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = isSignUp ? '<i class="fas fa-user-plus"></i> S\'inscrire' :
@@ -1770,7 +1145,6 @@
                 const name = currentUser.displayName || email.split('@')[0];
                 document.getElementById('userEmail').textContent = email;
                 document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
-                document.getElementById('userName').textContent = name;
             }
         }
 
@@ -1894,9 +1268,7 @@
                 createdAt: new Date(2023, 8, 1),
                 diplomas: [
                     { id: 'd1', name: 'Diplôme de Coran', date: '2024-06-15', level: 'Moyen', juz: '6 Hizb',
-                        score: '18,45/20', appreciation: 'Très Bien' },
-                    { id: 'd2', name: 'Diplôme de Fin d\'Études', date: '2024-12-20', level: 'Primaire', juz: '3 Hizb',
-                        score: '16,5/20', appreciation: 'Bien' }
+                        score: '18,45/20', appreciation: 'Très Bien' }
                 ]
             }, {
                 id: 'S002',
@@ -1915,10 +1287,7 @@
                 paymentStatus: 'crédit',
                 moralQualities: ['retard', 'perturbations'],
                 createdAt: new Date(2023, 9, 15),
-                diplomas: [
-                    { id: 'd3', name: 'Diplôme de Coran', date: '2024-05-20', level: 'Débutant', juz: '2 Hizb',
-                        score: '14/20', appreciation: 'Assez Bien' }
-                ]
+                diplomas: []
             }, {
                 id: 'S003',
                 code: 'ZAKOY0009a',
@@ -1939,7 +1308,6 @@
                 diplomas: []
             }];
 
-            // Sauvegarder dans Firestore
             for (const m of mockMadrassas) {
                 await db.collection('madrassas').doc(m.id).set(m);
             }
@@ -1956,12 +1324,8 @@
             const container = document.getElementById('madrassaList');
 
             if (currentMadrassas.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-school"></i>
-                        <p>Aucune madrassa trouvée</p>
-                    </div>
-                `;
+                container.innerHTML =
+                    `<div class="empty-state"><i class="fas fa-school"></i><p>Aucune madrassa trouvée</p></div>`;
                 return;
             }
 
@@ -1974,18 +1338,9 @@
                         ${m.distance ? `<span class="distance"><i class="fas fa-location-dot"></i> ${m.distance}</span>` : ''}
                     </div>
                     <div class="card-body">
-                        <div class="info-row">
-                            <i class="fas fa-map-pin"></i>
-                            <span>${m.city || 'N/A'}</span>
-                        </div>
-                        <div class="info-row">
-                            <i class="fas fa-user"></i>
-                            <span>Fondateur: ${m.founder || 'N/A'}</span>
-                        </div>
-                        <div class="info-row">
-                            <i class="fas fa-star" style="color:#ffd700;"></i>
-                            <span>${m.rating || 4.5} / 5</span>
-                        </div>
+                        <div class="info-row"><i class="fas fa-map-pin"></i><span>${m.city || 'N/A'}</span></div>
+                        <div class="info-row"><i class="fas fa-user"></i><span>Fondateur: ${m.founder || 'N/A'}</span></div>
+                        <div class="info-row"><i class="fas fa-star" style="color:#ffd700;"></i><span>${m.rating || 4.5} / 5</span></div>
                     </div>
                     ${currentUser?.role === 'directeur' ? `
                         <button class="manage-btn" onclick="event.stopPropagation(); showStudentManagement('${m.id}')">
@@ -2000,118 +1355,58 @@
         async function viewMadrassa(id) {
             currentMadrassaId = id;
             const m = currentMadrassas.find(x => x.id === id);
-            if (!m) {
-                showToast('Madrassa non trouvée', 'error');
-                return;
-            }
+            if (!m) { showToast('Madrassa non trouvée', 'error'); return; }
 
             const container = document.getElementById('madrassaDetail');
             container.innerHTML = `
                 <div class="detail-header">
                     <h2>${m.name}</h2>
-                    <div class="location">
-                        <i class="fas fa-map-pin"></i>
-                        <span>${m.address || m.city || 'N/A'}</span>
-                    </div>
+                    <div class="location"><i class="fas fa-map-pin"></i><span>${m.address || m.city || 'N/A'}</span></div>
                     ${m.distance ? `<div class="location"><i class="fas fa-location-dot" style="color:#0066cc;"></i><span>À ${m.distance}</span></div>` : ''}
                 </div>
 
                 <div class="detail-section">
                     <h4><i class="fas fa-info-circle"></i> Informations générales</h4>
                     <div class="info-grid">
-                        <div class="info-item">
-                            <i class="fas fa-user"></i>
-                            <span class="label">Fondateur</span>
-                            <span class="value">${m.founder || 'N/A'}</span>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-calendar-alt"></i>
-                            <span class="label">Date de création</span>
-                            <span class="value">${m.foundedDate || 'N/A'}</span>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-phone"></i>
-                            <span class="label">Téléphone</span>
-                            <span class="value">${m.phone || 'N/A'}</span>
-                        </div>
-                        <div class="info-item">
-                            <i class="fab fa-whatsapp" style="color:#25D366;"></i>
-                            <span class="label">WhatsApp</span>
-                            <span class="value">${m.whatsapp || 'N/A'}</span>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-clock"></i>
-                            <span class="label">Horaires</span>
-                            <span class="value">${m.schedule || 'N/A'}</span>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-tshirt"></i>
-                            <span class="label">Tenue</span>
-                            <span class="value">${m.dressCode || 'N/A'}</span>
-                        </div>
+                        <div class="info-item"><i class="fas fa-user"></i><span class="label">Fondateur</span><span class="value">${m.founder || 'N/A'}</span></div>
+                        <div class="info-item"><i class="fas fa-calendar-alt"></i><span class="label">Date de création</span><span class="value">${m.foundedDate || 'N/A'}</span></div>
+                        <div class="info-item"><i class="fas fa-phone"></i><span class="label">Téléphone</span><span class="value">${m.phone || 'N/A'}</span></div>
+                        <div class="info-item"><i class="fab fa-whatsapp" style="color:#25D366;"></i><span class="label">WhatsApp</span><span class="value">${m.whatsapp || 'N/A'}</span></div>
+                        <div class="info-item"><i class="fas fa-clock"></i><span class="label">Horaires</span><span class="value">${m.schedule || 'N/A'}</span></div>
+                        <div class="info-item"><i class="fas fa-tshirt"></i><span class="label">Tenue</span><span class="value">${m.dressCode || 'N/A'}</span></div>
                     </div>
                 </div>
 
                 <div class="detail-section">
                     <h4><i class="fas fa-gavel"></i> Règlement intérieur</h4>
-                    ${m.rules && m.rules.length > 0 ? m.rules.map(r => `
-                        <div class="rule-item">
-                            <i class="fas fa-check-circle"></i>
-                            <span>${r}</span>
-                        </div>
-                    `).join('') : '<p style="color:#999;">Aucune règle définie</p>'}
+                    ${m.rules && m.rules.length > 0 ? m.rules.map(r => `<div class="rule-item"><i class="fas fa-check-circle"></i><span>${r}</span></div>`).join('') : '<p style="color:#999;">Aucune règle définie</p>'}
                 </div>
 
                 <div class="detail-section">
                     <h4><i class="fas fa-money-bill-wave"></i> Tarifs</h4>
                     <div class="fees-container">
-                        <div class="fee-item">
-                            <span class="label">Inscription</span>
-                            <span class="value">${m.fees?.inscription || 'N/A'}</span>
-                        </div>
-                        <div class="fee-item">
-                            <span class="label">Mensuel</span>
-                            <span class="value">${m.fees?.mensuel || 'N/A'}</span>
-                        </div>
-                        <div class="fee-item">
-                            <span class="label">Annuel</span>
-                            <span class="value">${m.fees?.annuel || 'N/A'}</span>
-                        </div>
+                        <div class="fee-item"><span class="label">Inscription</span><span class="value">${m.fees?.inscription || 'N/A'}</span></div>
+                        <div class="fee-item"><span class="label">Mensuel</span><span class="value">${m.fees?.mensuel || 'N/A'}</span></div>
+                        <div class="fee-item"><span class="label">Annuel</span><span class="value">${m.fees?.annuel || 'N/A'}</span></div>
                     </div>
                 </div>
 
                 <div class="detail-section">
                     <h4><i class="fas fa-book"></i> Filières</h4>
-                    ${m.courses && m.courses.length > 0 ? m.courses.map(c => `
-                        <span class="course-badge">${c}</span>
-                    `).join('') : '<p style="color:#999;">Aucune filière définie</p>'}
+                    ${m.courses && m.courses.length > 0 ? m.courses.map(c => `<span class="course-badge">${c}</span>`).join('') : '<p style="color:#999;">Aucune filière définie</p>'}
                 </div>
 
                 <div class="detail-section">
                     <h4><i class="fas fa-chalkboard-teacher"></i> Enseignants</h4>
-                    ${m.teachers && m.teachers.length > 0 ? m.teachers.map(t => `
-                        <div class="teacher-item">
-                            <i class="fas fa-user-graduate"></i>
-                            <span class="name">${t.name}</span>
-                            <span class="subject">${t.subject}</span>
-                        </div>
-                    `).join('') : '<p style="color:#999;">Aucun enseignant</p>'}
+                    ${m.teachers && m.teachers.length > 0 ? m.teachers.map(t => `<div class="teacher-item"><i class="fas fa-user-graduate"></i><span class="name">${t.name}</span><span class="subject">${t.subject}</span></div>`).join('') : '<p style="color:#999;">Aucun enseignant</p>'}
                 </div>
 
                 <div class="detail-section">
                     <h4><i class="fas fa-star" style="color:#ffd700;"></i> Anciens élèves populaires</h4>
-                    ${m.alumni && m.alumni.length > 0 ? m.alumni.map(a => `
-                        <div class="alumni-item">
-                            <i class="fas fa-star" style="color:#ffd700;"></i>
-                            <span class="name">${a.name}</span>
-                            <span class="achievement">${a.achievement}</span>
-                        </div>
-                    `).join('') : '<p style="color:#999;">Aucun ancien élève</p>'}
+                    ${m.alumni && m.alumni.length > 0 ? m.alumni.map(a => `<div class="alumni-item"><i class="fas fa-star" style="color:#ffd700;"></i><span class="name">${a.name}</span><span class="achievement">${a.achievement}</span></div>`).join('') : '<p style="color:#999;">Aucun ancien élève</p>'}
                 </div>
 
-                <button class="inscription-btn" onclick="showInscription('${m.id}')">
-                    <i class="fas fa-user-plus"></i> Inscrire mon enfant
-                </button>
+                <button class="inscription-btn" onclick="showInscription('${m.id}')"><i class="fas fa-user-plus"></i> Inscrire mon enfant</button>
             `;
 
             showPage('detailPage');
@@ -2119,10 +1414,7 @@
 
         // ==================== SHOW INSCRIPTION ====================
         function showInscription(madrassaId) {
-            if (!currentUser) {
-                showToast('Veuillez vous connecter', 'error');
-                return;
-            }
+            if (!currentUser) { showToast('Veuillez vous connecter', 'error'); return; }
 
             currentMadrassaId = madrassaId;
             const container = document.getElementById('inscriptionForm');
@@ -2131,7 +1423,6 @@
                 <div class="form-section">
                     <h4><i class="fas fa-user-plus"></i> Inscription</h4>
                     <p style="color:#666; margin-bottom:15px;">Inscrivez votre enfant à la madrassa</p>
-
                     <form id="inscriptionFormData" onsubmit="event.preventDefault(); handleInscription();">
                         <div class="form-group">
                             <label>Prénom *</label>
@@ -2148,27 +1439,15 @@
                         <div class="form-group">
                             <label>Sexe</label>
                             <div class="radio-group">
-                                <label>
-                                    <input type="radio" name="gender" value="Masculin" checked>
-                                    <span><i class="fas fa-male"></i> Masculin</span>
-                                </label>
-                                <label>
-                                    <input type="radio" name="gender" value="Féminin">
-                                    <span><i class="fas fa-female"></i> Féminin</span>
-                                </label>
+                                <label><input type="radio" name="gender" value="Masculin" checked><span><i class="fas fa-male"></i> Masculin</span></label>
+                                <label><input type="radio" name="gender" value="Féminin"><span><i class="fas fa-female"></i> Féminin</span></label>
                             </div>
                         </div>
                         <div class="form-group">
                             <label>Disponibilité</label>
                             <div class="radio-group">
-                                <label>
-                                    <input type="radio" name="availability" value="Matin" checked>
-                                    <span><i class="fas fa-sun"></i> Matin</span>
-                                </label>
-                                <label>
-                                    <input type="radio" name="availability" value="Après-midi">
-                                    <span><i class="fas fa-moon"></i> Après-midi</span>
-                                </label>
+                                <label><input type="radio" name="availability" value="Matin" checked><span><i class="fas fa-sun"></i> Matin</span></label>
+                                <label><input type="radio" name="availability" value="Après-midi"><span><i class="fas fa-moon"></i> Après-midi</span></label>
                             </div>
                         </div>
                         <div class="form-group">
@@ -2177,7 +1456,7 @@
                         </div>
                         <div class="form-group">
                             <label>Téléphone du parent *</label>
-                            <input type="tel" id="sParentPhone" placeholder="Numéro de téléphone" value="${currentUser?.phoneNumber || ''}" required>
+                            <input type="tel" id="sParentPhone" placeholder="Numéro de téléphone" required>
                         </div>
                         <div class="form-group">
                             <div class="terms">
@@ -2185,9 +1464,7 @@
                                 <label for="sAcceptTerms">J'accepte les conditions générales d'inscription</label>
                             </div>
                         </div>
-                        <button class="btn-primary" type="submit">
-                            <i class="fas fa-check"></i> S'inscrire
-                        </button>
+                        <button class="btn-primary" type="submit"><i class="fas fa-check"></i> S'inscrire</button>
                     </form>
                 </div>
             `;
@@ -2210,11 +1487,7 @@
                 showToast('Veuillez remplir tous les champs obligatoires', 'error');
                 return;
             }
-
-            if (!acceptTerms) {
-                showToast('Vous devez accepter les conditions', 'error');
-                return;
-            }
+            if (!acceptTerms) { showToast('Vous devez accepter les conditions', 'error'); return; }
 
             try {
                 const code = generateStudentCode(firstName);
@@ -2233,6 +1506,7 @@
                     paymentStatus: 'non payé',
                     moralQualities: [],
                     diplomas: [],
+                    convocations: [],
                     code,
                     createdAt: new Date()
                 };
@@ -2261,15 +1535,8 @@
                 `${myStudents.length} enfant${myStudents.length > 1 ? 's' : ''} inscrit${myStudents.length > 1 ? 's' : ''}`;
 
             if (myStudents.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-child"></i>
-                        <p>Aucun enfant inscrit</p>
-                        <button class="btn-secondary" onclick="showPage('homePage')">
-                            <i class="fas fa-school"></i> Voir les madrassas
-                        </button>
-                    </div>
-                `;
+                container.innerHTML =
+                    `<div class="empty-state"><i class="fas fa-child"></i><p>Aucun enfant inscrit</p><button class="btn-secondary" onclick="showPage('homePage')"><i class="fas fa-school"></i> Voir les madrassas</button></div>`;
                 return;
             }
 
@@ -2289,14 +1556,11 @@
                         <span class="stat"><i class="fas fa-clock"></i> ${s.availability || 'N/A'}</span>
                         <span class="stat"><i class="fas fa-venus-mars"></i> ${s.gender || 'N/A'}</span>
                         <span class="stat" style="color:${getPaymentColor(s.paymentStatus)};">
-                            <i class="fas ${getPaymentIcon(s.paymentStatus)}"></i>
-                            ${s.paymentStatus || 'non payé'}
+                            <i class="fas ${getPaymentIcon(s.paymentStatus)}"></i> ${s.paymentStatus || 'non payé'}
                         </span>
                     </div>
                     ${s.moralQualities && s.moralQualities.length > 0 ? `
-                        <div class="qualities">
-                            ${s.moralQualities.map(q => `<span class="badge">${q}</span>`).join('')}
-                        </div>
+                        <div class="qualities">${s.moralQualities.map(q => `<span class="badge">${q}</span>`).join('')}</div>
                     ` : ''}
                     ${s.diplomas && s.diplomas.length > 0 ? `
                         <div style="margin-top:10px;padding-top:10px;border-top:1px solid #f0f0f0;">
@@ -2311,10 +1575,7 @@
         function viewStudent(id) {
             currentStudentId = id;
             const s = currentStudents.find(x => x.id === id);
-            if (!s) {
-                showToast('Élève non trouvé', 'error');
-                return;
-            }
+            if (!s) { showToast('Élève non trouvé', 'error'); return; }
 
             const container = document.getElementById('studentDetail');
 
@@ -2328,31 +1589,11 @@
 
                 <div class="detail-section">
                     <h4><i class="fas fa-info-circle"></i> Informations</h4>
-                    <div class="detail-row">
-                        <i class="fas fa-calendar-alt"></i>
-                        <span class="label">Date de naissance</span>
-                        <span class="value">${formatDate(s.birthDate)}</span>
-                    </div>
-                    <div class="detail-row">
-                        <i class="fas fa-venus-mars"></i>
-                        <span class="label">Sexe</span>
-                        <span class="value">${s.gender || 'N/A'}</span>
-                    </div>
-                    <div class="detail-row">
-                        <i class="fas fa-clock"></i>
-                        <span class="label">Disponibilité</span>
-                        <span class="value">${s.availability || 'N/A'}</span>
-                    </div>
-                    <div class="detail-row">
-                        <i class="fas fa-graduation-cap"></i>
-                        <span class="label">Niveau</span>
-                        <span class="value">${s.level || 'N/A'}</span>
-                    </div>
-                    <div class="detail-row">
-                        <i class="fas fa-phone"></i>
-                        <span class="label">Parent</span>
-                        <span class="value">${s.parentPhone || 'N/A'}</span>
-                    </div>
+                    <div class="detail-row"><i class="fas fa-calendar-alt"></i><span class="label">Date de naissance</span><span class="value">${formatDate(s.birthDate)}</span></div>
+                    <div class="detail-row"><i class="fas fa-venus-mars"></i><span class="label">Sexe</span><span class="value">${s.gender || 'N/A'}</span></div>
+                    <div class="detail-row"><i class="fas fa-clock"></i><span class="label">Disponibilité</span><span class="value">${s.availability || 'N/A'}</span></div>
+                    <div class="detail-row"><i class="fas fa-graduation-cap"></i><span class="label">Niveau</span><span class="value">${s.level || 'N/A'}</span></div>
+                    <div class="detail-row"><i class="fas fa-phone"></i><span class="label">Parent</span><span class="value">${s.parentPhone || 'N/A'}</span></div>
                 </div>
 
                 <div class="detail-section">
@@ -2361,8 +1602,7 @@
                         <i class="fas fa-credit-card"></i>
                         <span class="label">Statut actuel</span>
                         <span class="value" style="color:${getPaymentColor(s.paymentStatus)};">
-                            <i class="fas ${getPaymentIcon(s.paymentStatus)}"></i>
-                            ${s.paymentStatus || 'non payé'}
+                            <i class="fas ${getPaymentIcon(s.paymentStatus)}"></i> ${s.paymentStatus || 'non payé'}
                         </span>
                         <i class="fas fa-chevron-right arrow"></i>
                     </div>
@@ -2421,17 +1661,12 @@
             showPage('studentDetailPage');
         }
 
-        // ==================== OPEN QUALITIES MODAL ====================
+        // ==================== QUALITIES MODAL ====================
         function openQualitiesModal(studentId) {
             const s = currentStudents.find(x => x.id === studentId);
             if (!s) return;
 
-            const qualitiesOptions = [
-                'disponible', 'ponctuel', 'retard', 'absence',
-                'perturbations', 'timidité', 'exceptionnel',
-                'bien', 'très bien'
-            ];
-
+            const qualitiesOptions = ['disponible', 'ponctuel', 'retard', 'absence', 'perturbations', 'timidité', 'exceptionnel', 'bien', 'très bien'];
             const selected = s.moralQualities || [];
 
             const modal = document.getElementById('modalContent');
@@ -2441,8 +1676,7 @@
                 <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;">
                     ${qualitiesOptions.map(q => `
                         <span class="quality-option ${selected.includes(q) ? 'selected' : ''}" 
-                              onclick="this.classList.toggle('selected')" 
-                              data-quality="${q}">${q}</span>
+                              onclick="this.classList.toggle('selected')" data-quality="${q}">${q}</span>
                     `).join('')}
                 </div>
                 <div class="modal-buttons">
@@ -2471,7 +1705,7 @@
             viewStudent(studentId);
         }
 
-        // ==================== OPEN PAYMENT MODAL ====================
+        // ==================== PAYMENT MODAL ====================
         function openPaymentModal(studentId) {
             const s = currentStudents.find(x => x.id === studentId);
             if (!s) return;
@@ -2483,8 +1717,7 @@
                     ${['payé', 'crédit', 'avance', 'par tranche'].map(status => `
                         <button class="payment-option ${s.paymentStatus === status ? 'selected' : ''}" 
                                 onclick="savePaymentStatus('${studentId}', '${status}')">
-                            <i class="fas ${getPaymentIcon(status)}" style="color:${getPaymentColor(status)};"></i>
-                            ${status}
+                            <i class="fas ${getPaymentIcon(status)}" style="color:${getPaymentColor(status)};"></i> ${status}
                         </button>
                     `).join('')}
                 </div>
@@ -2507,27 +1740,15 @@
             viewStudent(studentId);
         }
 
-        // ==================== DIPLOME MANAGEMENT ====================
+        // ==================== DIPLOMA MODAL ====================
         function showAddDiplomaModal(studentId) {
             const modal = document.getElementById('modalContent');
             modal.innerHTML = `
                 <h3><i class="fas fa-trophy"></i> Attribuer un diplôme</h3>
-                <div class="form-group">
-                    <label>Nom du diplôme *</label>
-                    <input type="text" id="dName" placeholder="Ex: Diplôme de Coran" value="Diplôme Coranique">
-                </div>
-                <div class="form-group">
-                    <label>Nombre de Hizb</label>
-                    <input type="text" id="dJuz" placeholder="Ex: 6 Hizb" value="6 Hizb">
-                </div>
-                <div class="form-group">
-                    <label>Niveau</label>
-                    <input type="text" id="dLevel" placeholder="Ex: Moyen" value="Moyen">
-                </div>
-                <div class="form-group">
-                    <label>Note /20</label>
-                    <input type="text" id="dScore" placeholder="Ex: 18,45/20" value="18,45/20">
-                </div>
+                <div class="form-group"><label>Nom du diplôme *</label><input type="text" id="dName" placeholder="Ex: Diplôme de Coran" value="Diplôme Coranique"></div>
+                <div class="form-group"><label>Nombre de Hizb</label><input type="text" id="dJuz" placeholder="Ex: 6 Hizb" value="6 Hizb"></div>
+                <div class="form-group"><label>Niveau</label><input type="text" id="dLevel" placeholder="Ex: Moyen" value="Moyen"></div>
+                <div class="form-group"><label>Note /20</label><input type="text" id="dScore" placeholder="Ex: 18,45/20" value="18,45/20"></div>
                 <div class="form-group">
                     <label>Appréciation</label>
                     <select id="dAppreciation">
@@ -2538,10 +1759,7 @@
                         <option value="Passable">Passable</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label>Date</label>
-                    <input type="date" id="dDate">
-                </div>
+                <div class="form-group"><label>Date</label><input type="date" id="dDate"></div>
                 <div class="modal-buttons">
                     <button class="btn-cancel" onclick="closeModal()">Annuler</button>
                     <button class="btn-save" onclick="saveDiploma('${studentId}')">Attribuer</button>
@@ -2562,16 +1780,7 @@
             const s = currentStudents.find(x => x.id === studentId);
             if (s) {
                 if (!s.diplomas) s.diplomas = [];
-                const newDiploma = {
-                    id: 'd' + Date.now(),
-                    name,
-                    juz,
-                    level,
-                    score,
-                    appreciation,
-                    date
-                };
-                s.diplomas.push(newDiploma);
+                s.diplomas.push({ id: 'd' + Date.now(), name, juz, level, score, appreciation, date });
                 db.collection('students').doc(studentId).update({ diplomas: s.diplomas });
                 showToast('Diplôme attribué avec succès !');
             }
@@ -2580,27 +1789,15 @@
             viewStudent(studentId);
         }
 
-        // ==================== CONVOCATION MANAGEMENT ====================
+        // ==================== CONVOCATION MODAL ====================
         function showAddConvocationModal(studentId) {
             const modal = document.getElementById('modalContent');
             modal.innerHTML = `
                 <h3><i class="fas fa-bell"></i> Ajouter une convocation</h3>
-                <div class="form-group">
-                    <label>Titre *</label>
-                    <input type="text" id="cTitle" placeholder="Ex: Réunion parents" value="Réunion">
-                </div>
-                <div class="form-group">
-                    <label>Date</label>
-                    <input type="date" id="cDate">
-                </div>
-                <div class="form-group">
-                    <label>Heure</label>
-                    <input type="time" id="cTime" value="15:00">
-                </div>
-                <div class="form-group">
-                    <label>Description</label>
-                    <input type="text" id="cDescription" placeholder="Description de la convocation">
-                </div>
+                <div class="form-group"><label>Titre *</label><input type="text" id="cTitle" placeholder="Ex: Réunion parents" value="Réunion"></div>
+                <div class="form-group"><label>Date</label><input type="date" id="cDate"></div>
+                <div class="form-group"><label>Heure</label><input type="time" id="cTime" value="15:00"></div>
+                <div class="form-group"><label>Description</label><input type="text" id="cDescription" placeholder="Description de la convocation"></div>
                 <div class="modal-buttons">
                     <button class="btn-cancel" onclick="closeModal()">Annuler</button>
                     <button class="btn-save" onclick="saveConvocation('${studentId}')">Ajouter</button>
@@ -2640,64 +1837,50 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('landscape', 'mm', 'a4');
 
-            // Couleurs et styles
             const gold = '#C5A55A';
             const darkGold = '#8B7B3F';
-            const borderColor = '#D4AF37';
 
-            // Fond dégradé - bordure décorative
             doc.setFillColor(248, 245, 235);
             doc.rect(5, 5, 287, 200, 'F');
 
-            // Bordure or
             doc.setDrawColor(gold);
             doc.setLineWidth(1.5);
             doc.rect(12, 12, 273, 186);
 
-            // Bordure intérieure or double
             doc.setDrawColor(darkGold);
             doc.setLineWidth(0.5);
             doc.rect(16, 16, 265, 178);
 
-            // Titre principal
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(28);
             doc.setTextColor(darkGold);
             doc.text('DIPLÔME CORANIQUE', 148, 35, { align: 'center' });
 
-            // Sous-titre
             doc.setFont('helvetica', 'bolditalic');
             doc.setFontSize(14);
             doc.setTextColor('#555');
             doc.text('CERTIFICAT DE RÉUSSITE DANS L\'ÉTUDE DU CORAN', 148, 45, { align: 'center' });
 
-            // Ligne décorative
             doc.setDrawColor(gold);
             doc.setLineWidth(1);
             doc.line(60, 50, 237, 50);
 
-            // Nom du directeur
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(12);
             doc.setTextColor('#333');
             doc.text('Je soussigné(e) Cheikh Ahmed, Directeur de la Madrassa Al-Nour', 148, 62, { align: 'center' });
-
-            // Certifie
             doc.text('certifie par la présente que', 148, 72, { align: 'center' });
 
-            // Nom de l'élève (grand)
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(24);
             doc.setTextColor(darkGold);
             doc.text(`${s.firstName || ''} ${s.lastName || ''}`, 148, 87, { align: 'center' });
 
-            // Description du diplôme
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(13);
             doc.setTextColor('#333');
-            doc.text(`a satisfait avec succès aux exigences de mémorisation et de compréhension de`, 148, 100, { align: 'center' });
+            doc.text('a satisfait avec succès aux exigences de mémorisation et de compréhension de', 148, 100, { align: 'center' });
 
-            // Nombre de Hizb en grand
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(22);
             doc.setTextColor(darkGold);
@@ -2708,22 +1891,19 @@
             doc.setTextColor('#333');
             doc.text('DU SAINT CORAN', 148, 125, { align: 'center' });
 
-            // Ligne décorative
             doc.setDrawColor(gold);
             doc.setLineWidth(0.8);
             doc.line(50, 130, 247, 130);
 
-            // Tableau des informations
             const tableData = [
                 ['Niveau d\'études', 'Moyenne générale', 'Appréciation', 'Année académique', 'Destinataire'],
                 [d.level || 'Moyen', d.score || '18,45/20', d.appreciation || 'Très Bien', d.date ? d.date.split('-')[0] + '-' + (parseInt(d.date.split('-')[0]) + 1) : '2024-2025', 'Parents / Tuteurs']
             ];
 
-            let startX = 25;
-            let startY = 140;
+            let startX = 25,
+                startY = 140;
             const colWidths = [45, 45, 45, 45, 45];
 
-            // En-tête
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(10);
             doc.setTextColor('#fff');
@@ -2733,7 +1913,6 @@
                 doc.text(header, startX + i * colWidths[i] + colWidths[i] / 2, startY + 7, { align: 'center' });
             });
 
-            // Données
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(10);
             doc.setTextColor('#333');
@@ -2744,7 +1923,6 @@
                 doc.text(value, startX + i * colWidths[i] + colWidths[i] / 2, y2 + 7, { align: 'center' });
             });
 
-            // Texte de prière
             const y3 = y2 + 18;
             doc.setFont('helvetica', 'italic');
             doc.setFontSize(11);
@@ -2753,28 +1931,24 @@
             doc.text('de lui accorder la réussite ici-bas et dans l\'au-delà,', 148, y3 + 7, { align: 'center' });
             doc.text('et d\'en faire un récitant du Coran, guidé et bienfaisant.', 148, y3 + 14, { align: 'center' });
 
-            // ID Diplôme
             const y4 = y3 + 24;
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(11);
             doc.setTextColor('#333');
             doc.text(`ID DIPLÔME: AN-${d.date ? d.date.split('-')[0] : '2024'}-${d.date ? d.date.split('-')[1] : '2025'}-${String(Math.floor(Math.random() * 100000)).padStart(6, '0')}`, 148, y4, { align: 'center' });
 
-            // Signature
             const y5 = y4 + 20;
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(11);
             doc.setTextColor('#333');
             doc.text('Fait à Cotonou, le ' + (d.date || new Date().toISOString().split('T')[0]), 148, y5, { align: 'center' });
 
-            // Ligne pour la signature
             doc.setDrawColor('#333');
             doc.setLineWidth(0.5);
             doc.line(180, y5 + 10, 230, y5 + 10);
             doc.setFontSize(10);
             doc.text('Le Directeur', 205, y5 + 17, { align: 'center' });
 
-            // Verset du Coran
             const y6 = y5 + 30;
             doc.setFont('helvetica', 'italic');
             doc.setFontSize(10);
@@ -2783,7 +1957,6 @@
             doc.setFontSize(9);
             doc.text('(Sourate Al-Muzzammil : 73)', 148, y6 + 6, { align: 'center' });
 
-            // QR Code factice
             doc.setFillColor(gold);
             doc.rect(250, 160, 30, 30, 'F');
             doc.setFont('helvetica', 'bold');
@@ -2793,7 +1966,6 @@
             doc.text('POUR', 265, 180, { align: 'center' });
             doc.text('VÉRIFIER', 265, 188, { align: 'center' });
 
-            // Télécharger le PDF
             const pdfBlob = doc.output('blob');
             const url = URL.createObjectURL(pdfBlob);
             const link = document.createElement('a');
@@ -2817,12 +1989,13 @@
             const allDiplomas = [];
             myStudents.forEach(student => {
                 if (student.diplomas) {
-                    student.diplomas.forEach(d => {
+                    student.diplomas.forEach((d, index) => {
                         allDiplomas.push({
                             ...d,
                             studentName: `${student.firstName || ''} ${student.lastName || ''}`,
                             studentCode: student.code || 'N/A',
-                            studentId: student.id
+                            studentId: student.id,
+                            index: index
                         });
                     });
                 }
@@ -2832,16 +2005,11 @@
                 `${allDiplomas.length} diplôme${allDiplomas.length > 1 ? 's' : ''}`;
 
             if (allDiplomas.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-trophy"></i>
-                        <p>Aucun diplôme</p>
-                    </div>
-                `;
+                container.innerHTML = `<div class="empty-state"><i class="fas fa-trophy"></i><p>Aucun diplôme</p></div>`;
                 return;
             }
 
-            container.innerHTML = allDiplomas.map((d, index) => `
+            container.innerHTML = allDiplomas.map(d => `
                 <div class="diploma-card">
                     <div class="icon"><i class="fas fa-certificate"></i></div>
                     <div class="info">
@@ -2852,29 +2020,12 @@
                         <div style="font-size:12px;color:#666;">Note: ${d.score || 'N/A'} • ${d.appreciation || 'N/A'}</div>
                         <div style="font-size:12px;color:#999;">Délivré le: ${d.date || 'N/A'}</div>
                     </div>
-                    <button onclick="generateDiplomaPDFFromList('${d.studentId}', ${index})" 
+                    <button onclick="generateDiplomaPDF('${d.studentId}', ${d.index})" 
                             style="padding:8px 14px;background:#0066cc;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:bold;">
                         <i class="fas fa-download"></i> PDF
                     </button>
                 </div>
             `).join('');
-        }
-
-        function generateDiplomaPDFFromList(studentId, diplomaIndex) {
-            // Trouver l'étudiant et son diplôme
-            const s = currentStudents.find(x => x.id === studentId);
-            if (!s || !s.diplomas || !s.diplomas[diplomaIndex]) {
-                showToast('Diplôme non trouvé', 'error');
-                return;
-            }
-
-            const d = s.diplomas[diplomaIndex];
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('landscape', 'mm', 'a4');
-
-            // ... (même code que generateDiplomaPDF)
-            // Pour éviter la duplication, on appelle la fonction existante
-            generateDiplomaPDF(studentId, diplomaIndex);
         }
 
         // ==================== CONVOCATIONS PAGE ====================
@@ -2901,12 +2052,7 @@
                 `${allConvocations.length} convocation${allConvocations.length > 1 ? 's' : ''}`;
 
             if (allConvocations.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-bell"></i>
-                        <p>Aucune convocation</p>
-                    </div>
-                `;
+                container.innerHTML = `<div class="empty-state"><i class="fas fa-bell"></i><p>Aucune convocation</p></div>`;
                 return;
             }
 
@@ -2943,7 +2089,6 @@
             if (currentFilter === 'pending') filtered = madrassaStudents.filter(s => s.status === 'pending');
             if (currentFilter === 'accepted') filtered = madrassaStudents.filter(s => s.status === 'accepted');
 
-            // Update filter counts
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 const filter = btn.dataset.filter;
                 let count = madrassaStudents.length;
@@ -2953,12 +2098,7 @@
             });
 
             if (filtered.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-users"></i>
-                        <p>Aucun élève dans cette catégorie</p>
-                    </div>
-                `;
+                container.innerHTML = `<div class="empty-state"><i class="fas fa-users"></i><p>Aucun élève dans cette catégorie</p></div>`;
                 return;
             }
 
@@ -3071,8 +2211,6 @@
                 showToast('Madrassa ajoutée avec succès');
                 showPage('homePage');
                 renderMadrassas();
-
-                // Reset form
                 document.getElementById('addMadrassaForm').reset();
 
             } catch (error) {
@@ -3080,7 +2218,7 @@
             }
         }
 
-        // ==================== CLOSE MODAL ON OVERLAY CLICK ====================
+        // ==================== CLOSE MODAL ====================
         document.getElementById('modalOverlay').addEventListener('click', function(e) {
             if (e.target === this) closeModal();
         });
@@ -3096,12 +2234,9 @@
                 updateUserUI();
                 await loadData();
                 showPage('homePage');
-            } else {
-                // Reste sur la page d'auth
             }
         });
 
-        // ==================== INIT ====================
         console.log('Madrassa App avec Diplômes PDF chargée !');
         console.log('Firebase config:', firebaseConfig);
     </script>
