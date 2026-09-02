@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#00695C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Madrassa App</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+
+<style>
+/* ==========================================
+   DESIGN SYSTEM FLUTTER (Material Design 3)
+   ========================================== */
+:root {
+  --primary: #00695C;
+  --primary-container: #B2DFDB;
+  --on-primary: #FFFFFF;
+  --background: #F5F5F5;
+  --surface: #FFFFFF;
+  --on-surface: #1C1B1F;
+  --on-surface-variant: #49454F;
+  --outline: #79747E;
+  --error: #B3261E;
+  --shadow: rgba(0,0,0,0.15);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: 'Roboto', sans-serif;
+  background: var(--background);
+  color: var(--on-surface);
+  overflow-x: hidden;
+  height: 100vh;
+  overscroll-behavior-y: none; /* Empêche le pull-to-refresh natif */
+}
+
+/* --- Scaffold & Navigation --- */
+.scaffold {
+  display: none;
+  flex-direction: column;
+  height: 100vh;
+  animation: fadeIn 0.25s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+.scaffold.active { display: flex; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.app-bar {
+  background: var(--primary);
+  color: var(--on-primary);
+  padding: 16px;
+  padding-top: max(16px, env(safe-area-inset-top));
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 1px 3px var(--shadow);
+  z-index: 100;
+}
+.app-bar h1 { font-size: 20px; font-weight: 500; flex: 1; }
+.app-bar .material-icons-round { font-size: 24px; cursor: pointer; }
+
+.bottom-nav {
+  background: var(--surface);
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+  box-shadow: 0 -1px 3px var(--shadow);
+  z-index: 100;
+}
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 16px;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.nav-item.active { color: var(--primary); }
+.nav-item.active .material-icons-round { font-variation-settings: 'FILL' 1; }
+.nav-item span { font-size: 12px; font-weight: 500; margin-top: 4px; }
+
+/* --- Components --- */
+.content { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 80px; }
+
+.card {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 1px 3px 1px rgba(0,0,0,0.15);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.card:active { transform: scale(0.98); }
+
+.fab {
+  position: fixed;
+  bottom: max(24px, calc(env(safe-area-inset-bottom) + 70px));
+  right: 16px;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--primary-container);
+  color: #003831;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px 3px var(--shadow);
+  cursor: pointer;
+  z-index: 90;
+  border: none;
+}
+.fab .material-icons-round { font-size: 24px; }
+
+/* --- Formulaires (Style Flutter TextField) --- */
+.input-group { margin-bottom: 16px; position: relative; }
+.input-group label {
+  position: absolute;
+  left: 12px;
+  top: -8px;
+  background: var(--background);
+  padding: 0 4px;
+  font-size: 12px;
+  color: var(--primary);
+  font-weight: 500;
+}
+.input-group input, .input-group select, .input-group textarea {
+  width: 100%;
+  padding: 14px 12px;
+  border: 1px solid var(--outline);
+  border-radius: 4px;
+  font-size: 16px;
+  background: var(--surface);
+  font-family: 'Roboto', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.input-group input:focus, .input-group select:focus, .input-group textarea:focus {
+  border: 2px solid var(--primary);
+  padding: 13px 11px; /* Compense la bordure de 2px */
+}
+
+.btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-primary { background: var(--primary); color: var(--on-primary); box-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+.btn-primary:active { background: #004D40; }
+.btn-secondary { background: transparent; color: var(--primary); border: 1px solid var(--outline); }
+
+/* --- Badges & Tags --- */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: var(--primary-container);
+  color: #003831;
+  font-size: 12px;
+  font-weight: 500;
+  margin: 4px 4px 4px 0;
+}
+.chip.outlined { background: transparent; border: 1px solid var(--outline); color: var(--on-surface-variant); }
+
+/* --- Snackbar (Toast Flutter) --- */
+.snackbar {
+  position: fixed;
+  bottom: max(24px, calc(env(safe-area-inset-bottom) + 70px));
+  left: 16px;
+  right: 16px;
+  background: #322F35;
+  color: #F4EFF4;
+  padding: 14px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 3px 5px -1px rgba(0,0,0,0.2), 0 6px 10px 0 rgba(0,0,0,0.14);
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  z-index: 1000;
+}
+.snackbar.show { transform: translateY(0); opacity: 1; }
+
+/* --- Utilitaires --- */
+.text-subtitle { font-size: 14px; color: var(--on-surface-variant); margin-top: 4px; }
+.text-caption { font-size: 12px; color: var(--on-surface-variant); }
+.divider { height: 1px; background: var(--outline); opacity: 0.3; margin: 16px 0; }
+.row { display: flex; align-items: center; gap: 12px; }
+.col { display: flex; flex-direction: column; }
+.flex-1 { flex: 1; }
+.text-right { text-align: right; }
+.code-box {
+  background: #E0F2F1;
+  border: 1px dashed var(--primary);
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  font-family: monospace;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: 2px;
+  margin: 16px 0;
+}
+
+/* Checkbox style Flutter */
+.checkbox-wrapper { display: flex; align-items: center; gap: 12px; margin: 16px 0; cursor: pointer; }
+.checkbox-wrapper input { width: 18px; height: 18px; accent-color: var(--primary); }
+</style>
+</head>
+<body>
+
+<!-- ==================== ÉCRAN DE CONNEXION ==================== -->
+<div id="screen-login" class="scaffold active" style="background: var(--primary); justify-content: center; padding: 24px;">
+  <div style="text-align: center; color: white; margin-bottom: 40px;">
+    <span class="material-icons-round" style="font-size: 64px; margin-bottom: 16px;">mosque</span>
+    <h1 style="font-size: 28px; font-weight: 300;">Madrassa Manager</h1>
+    <p style="opacity: 0.8; margin-top: 8px;">Gestion simplifiée des écoles coraniques</p>
+  </div>
+  
+  <div style="background: var(--surface); border-radius: 28px 28px 0 0; padding: 24px 24px 40px; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+    <div class="input-group">
+      <label>Numéro de téléphone</label>
+      <input type="tel" id="login-phone" placeholder="Ex: 701234567">
+    </div>
+    <div class="input-group">
+      <label>Mot de passe</label>
+      <input type="password" id="login-password" placeholder="••••••••">
+    </div>
+    <button class="btn btn-primary" style="margin-top: 8px;" onclick="app.login()">
+      <span class="material-icons-round">login</span> Se connecter
+    </button>
+    <button class="btn btn-secondary" style="margin-top: 12px;" onclick="app.navigate('screen-register')">
+      Créer un compte
+    </button>
+  </div>
+</div>
+
+<!-- ==================== ÉCRAN D'INSCRIPTION ==================== -->
+<div id="screen-register" class="scaffold" style="background: var(--primary); justify-content: center; padding: 24px;">
+  <div style="background: var(--surface); border-radius: 28px; padding: 24px; width: 100%;">
+    <h2 style="margin-bottom: 24px; color: var(--primary);">Inscription</h2>
+    <div class="input-group">
+      <label>Nom complet</label>
+      <input type="text" id="reg-name" placeholder="Votre nom">
+    </div>
+    <div class="input-group">
+      <label>Numéro de téléphone</label>
+      <input type="tel" id="reg-phone" placeholder="Ex: 701234567">
+    </div>
+    <div class="input-group">
+      <label>Mot de passe</label>
+      <input type="password" id="reg-password" placeholder="Minimum 6 caractères">
+    </div>
+    <div class="input-group">
+      <label>Vous êtes</label>
+      <select id="reg-role">
+        <option value="parent">Parent d'élève</option>
+        <option value="director">Directeur de Madrassa</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" onclick="app.register()">S'inscrire</button>
+    <button class="btn btn-secondary" style="margin-top: 12px;" onclick="app.navigate('screen-login')">Retour</button>
+  </div>
+</div>
+
+<!-- ==================== ÉCRAN PRINCIPAL (LISTE MADRASSAS) ==================== -->
+<div id="screen-home" class="scaffold">
+  <div class="app-bar">
+    <span class="material-icons-round" onclick="app.logout()">logout</span>
+    <h1>Madrassas</h1>
+    <span class="material-icons-round" onclick="app.getLocation()">my_location</span>
+  </div>
+  <div class="content" id="home-content">
+    <!-- Liste injectée par JS -->
+  </div>
+  <button class="fab" id="fab-add-madrassa" onclick="app.navigate('screen-add-madrassa')" style="display: none;">
+    <span class="material-icons-round">add</span>
+  </button>
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="app.navigate('screen-home')">
+      <span class="material-icons-round">home</span><span>Accueil</span>
+    </div>
+    <div class="nav-item" onclick="app.navigate('screen-students')" id="nav-students" style="display: none;">
+      <span class="material-icons-round">school</span><span>Élèves</span>
+    </div>
+    <div class="nav-item" onclick="app.navigate('screen-parent-dashboard')" id="nav-parent" style="display: none;">
+      <span class="material-icons-round">dashboard</span><span>Suivi</span>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== ÉCRAN AJOUT MADRASSA ==================== -->
+<div id="screen-add-madrassa" class="scaffold">
+  <div class="app-bar">
+    <span class="material-icons-round" onclick="app.navigate('screen-home')">arrow_back</span>
+    <h1>Nouvelle Madrassa</h1>
+  </div>
+  <div class="content">
+    <div class="input-group"><label>Nom *</label><input type="text" id="m-name"></div>
+    <div class="input-group"><label>Ville *</label><input type="text" id="m-city"></div>
+    <div class="input-group"><label>Position GPS</label><input type="text" id="m-gps" placeholder="Appuyez sur le bouton ci-dessous" readonly></div>
+    <button class="btn btn-secondary" style="margin-bottom: 16px;" onclick="app.getLocation()">
+      <span class="material-icons-round">gps_fixed</span> Capturer ma position
+    </button>
+    <div class="input-group"><label>Horaires *</label><input type="text" id="m-schedule" placeholder="Ex: 8h-12h, 14h-18h"></div>
+    <div class="input-group"><label>Tarifs *</label><input type="text" id="m-fees" placeholder="Ex: 15000 FCFA/mois"></div>
+    <div class="input-group"><label>Règlement intérieur *</label><textarea id="m-regulations" rows="4"></textarea></div>
+    <div class="input-group"><label>Filières</label><input type="text" id="m-tracks" placeholder="Ex: Mémorisation, Tafsir"></div>
+    <div class="input-group"><label>Nom du fondateur *</label><input type="text" id="m-founder"></div>
+    <div class="input-group"><label>Oustazs (un par ligne)</label><textarea id="m-teachers" rows="3"></textarea></div>
+    <div class="input-group"><label>Anciens élèves populaires (un par ligne)</label><textarea id="m-alumni" rows="3"></textarea></div>
+    <div class="input-group"><label>WhatsApp</label><input type="tel" id="m-whatsapp"></div>
+    <button class="btn btn-primary" onclick="app.saveMadrassa()">Enregistrer</button>
+  </div>
+</div>
+
+<!-- ==================== ÉCRAN DÉTAIL MADRASSA ==================== -->
+<div id="screen-madrassa-detail" class="scaffold">
+  <div class="app-bar">
+    <span class="material-icons-round" onclick="app.navigate('screen-home')">arrow_back</span>
+    <h1 id="detail-title">Détails</h1>
+  </div>
+  <div class="content" id="detail-content"></div>
+  <div style="padding: 16px; background: var(--surface); border-top: 1px solid var(--outline);">
+    <button class="btn btn-primary" onclick="app.navigate('screen-enroll')">
+      <span class="material-icons-round">person_add</span> Inscrire mon enfant
+    </button>
+  </div>
+</div>
+
+<!-- ==================== ÉCRAN INSCRIPTION ÉLÈVE ==================== -->
+<div id="screen-enroll" class="scaffold">
+  <div class="app-bar">
+    <span class="material-icons-round" onclick="app.navigate('screen-madrassa-detail')">arrow_back</span>
+    <h1>Inscription</h1>
+  </div>
+  <div class="content">
+    <div class="input-group"><label>Nom *</label><input type="text" id="s-lastname"></div>
+    <div class="input-group"><label>Prénom *</label><input type="text" id="s-firstname"></div>
+    <div class="input-group"><label>Date de naissance *</label><input type="date" id="s-dob"></div>
+    <div class="input-group">
+      <label>Sexe</label>
+      <select id="s-gender"><option value="M">Masculin</option><option value="F">Féminin</option></select>
+    </div>
+    <div class="input-group">
+      <label>Disponibilité</label>
+      <select id="s-availability">
+        <option>Matin uniquement</option>
+        <option>Après-midi uniquement</option>
+        <option>Journée complète</option>
+      </select>
+    </div>
+    <div class="input-group"><label>Niveau d'études</label><input type="text" id="s-level" placeholder="Ex: Débutant"></div>
+    <div class="input-group"><label>Téléphone du parent *</label><input type="tel" id="s-parent-phone"></div>
+    
+    <label class="checkbox-wrapper">
+      <input type="checkbox" id="s-accept">
+      <span>J'accepte les conditions et le règlement intérieur</span>
+    </label>
+    
+    <button class="btn btn-primary" onclick="app.enrollStudent()">Confirmer l'inscription</button>
+  </div>
+</div>
+
+<!-- ==================== ÉCRAN LISTE ÉLÈVES (DIRECTEUR) ==================== -->
+<div id="screen-students" class="scaffold">
+  <div class="app-bar">
+    <span class="material-icons-round" onclick="app.navigate('screen-home')">arrow_back</span>
+    <h1>Mes Élèves</h1>
+  </div>
+  <div class="content" id="students-content"></div>
+</div>
+
+<!-- ==================== ÉCRAN DÉTAIL ÉLÈVE ==================== -->
+<div id="screen-student-detail" class="scaffold">
+  <div class="app-bar">
+    <span class="material-icons-round" onclick="app.navigate('screen-students')">arrow_back</span>
+    <h1 id="student-detail-name">Élève</h1>
+  </div>
+  <div class="content" id="student-detail-content"></div>
+</div>
+
+<!-- ==================== ÉCRAN TABLEAU DE BORD PARENT ==================== -->
+<div id="screen-parent-dashboard" class="scaffold">
+  <div class="app-bar">
+    <span class="material-icons-round" onclick="app.navigate('screen-home')">arrow_back</span>
+    <h1>Suivi de l'enfant</h1>
+  </div>
+  <div class="content" id="parent-content"></div>
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="app.navigate('screen-home')">
+      <span class="material-icons-round">home</span><span>Accueil</span>
+    </div>
+    <div class="nav-item active" onclick="app.navigate('screen-parent-dashboard')">
+      <span class="material-icons-round">dashboard</span><span>Suivi</span>
+    </div>
+  </div>
+</div>
+
+<!-- Snackbar -->
+<div id="snackbar" class="snackbar">
+  <span id="snackbar-text">Message</span>
+</div>
+
+<script>
+// ==========================================
+// CONFIGURATION FIREBASE (VOS DONNÉES)
+// ==========================================
+const firebaseConfig = {
+  apiKey: "AIzaSyBi57H0lwyCs1hhfd165n3jluaaaF5b5Fc",
+  authDomain: "madarassa-a2bab.firebaseapp.com",
+  projectId: "madarassa-a2bab",
+  storageBucket: "madarassa-a2bab.firebasestorage.app",
+  messagingSenderId: "364377537370",
+  appId: "1:364377537370:web:82042ee3a2596db27a9163" // Adapté pour le web
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const auth = firebase.auth();
+
+// ==========================================
+// LOGIQUE DE L'APPLICATION (Style Flutter State)
+// ==========================================
+const app = {
+  user: null,
+  currentMadrassaId: null,
+  currentStudentId: null,
+  userLocation: null,
+
+  // --- Navigation ---
+  navigate: (screenId) => {
+    document.querySelectorAll('.scaffold').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
+    
+    // Mise à jour de la bottom nav
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    if(screenId === 'screen-home') document.querySelectorAll('.nav-item')[0].classList.add('active');
+    if(screenId === 'screen-students') document.querySelectorAll('.nav-item')[1].classList.add('active');
+    if(screenId === 'screen-parent-dashboard') document.querySelectorAll('.nav-item')[2].classList.add('active');
+
+    // Chargement des données spécifiques
+    if (screenId === 'screen-home') app.loadMadrassas();
+    if (screenId === 'screen-students') app.loadStudents();
+    if (screenId === 'screen-parent-dashboard') app.loadParentDashboard();
+  },
+
+  showSnackbar: (msg) => {
+    const sb = document.getElementById('snackbar');
+    document.getElementById('snackbar-text').textContent = msg;
+    sb.classList.add('show');
+    setTimeout(() => sb.classList.remove('show'), 3000);
+  },
+
+  // --- Authentification ---
+  register: async () => {
+    const name = document.getElementById('reg-name').value.trim();
+    const phone = document.getElementById('reg-phone').value.trim();
+    const password = document.getElementById('reg-password').value;
+    const role = document.getElementById('reg-role').value;
+
+    if (!name || !phone || !password) return app.showSnackbar('Remplissez tous les champs');
+    
+    try {
+      // Firebase Auth nécessite un email, on simule avec le téléphone
+      const email = phone.replace(/\D/g, '') + '@madrassa.app';
+      const cred = await auth.createUserWithEmailAndPassword(email, password);
+      
+      await db.collection('users').doc(cred.user.uid).set({
+        name, phone, role, 
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      
+      app.user = { uid: cred.user.uid, name, phone, role };
+      app.showSnackbar('Compte créé avec succès');
+      app.setupUI();
+    } catch (e) {
+      app.showSnackbar('Erreur: ' + e.message);
+    }
+  },
+
+  login: async () => {
+    const phone = document.getElementById('login-phone').value.trim();
+    const password = document.getElementById('login-password').value;
+    if (!phone || !password) return app.showSnackbar('Remplissez tous les champs');
+
+    try {
+      const email = phone.replace(/\D/g, '') + '@madrassa.app';
+      const cred = await auth.signInWithEmailAndPassword(email, password);
+      const doc = await db.collection('users').doc(cred.user.uid).get();
+      app.user = { uid: cred.user.uid, ...doc.data() };
+      app.showSnackbar('Connexion réussie');
+      app.setupUI();
+    } catch (e) {
+      app.showSnackbar('Numéro ou mot de passe incorrect');
+    }
+  },
+
+  logout: () => {
+    auth.signOut();
+    app.user = null;
+    app.navigate('screen-login');
+  },
+
+  setupUI: () => {
+    if (app.user.role === 'director') {
+      document.getElementById('fab-add-madrassa').style.display = 'flex';
+      document.getElementById('nav-students').style.display = 'flex';
+      document.getElementById('nav-parent').style.display = 'none';
+    } else {
+      document.getElementById('fab-add-madrassa').style.display = 'none';
+      document.getElementById('nav-students').style.display = 'none';
+      document.getElementById('nav-parent').style.display = 'flex';
+    }
+    app.navigate('screen-home');
+  },
+
+  // --- Géolocalisation ---
+  getLocation: () => {
+    if (!navigator.geolocation) return app.showSnackbar('Géolocalisation non supportée');
+    app.showSnackbar('Localisation en cours...');
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        app.userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        const gpsInput = document.getElementById('m-gps');
+        if (gpsInput) gpsInput.value = `${app.userLocation.lat.toFixed(5)}, ${app.userLocation.lng.toFixed(5)}`;
+        app.showSnackbar('Position capturée');
+      },
+      () => app.showSnackbar('Veuillez autoriser la localisation')
+    );
+  },
+
+  // --- Madrassas ---
+  saveMadrassa: async () => {
+    const name = document.getElementById('m-name').value;
+    const city = document.getElementById('m-city').value;
+    const founder = document.getElementById('m-founder').value;
+    if (!name || !city || !founder) return app.showSnackbar('Champs obligatoires manquants');
+
+    await db.collection('madrassas').add({
+      name, city, founder,
+      schedule: document.getElementById('m-schedule').value,
+      fees: document.getElementById('m-fees').value,
+      regulations: document.getElementById('m-regulations').value,
+      tracks: document.getElementById('m-tracks').value,
+      teachers: document.getElementById('m-teachers').value.split('\n').filter(x=>x),
+      alumni: document.getElementById('m-alumni').value.split('\n').filter(x=>x),
+      whatsapp: document.getElementById('m-whatsapp').value,
+      location: app.userLocation ? new firebase.firestore.GeoPoint(app.userLocation.lat, app.userLocation.lng) : null,
+      ownerId: app.user.uid,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    app.showSnackbar('Madrassa créée !');
+    app.navigate('screen-home');
+  },
+
+  loadMadrassas: async () => {
+    const container = document.getElementById('home-content');
+    container.innerHTML = '<div style="text-align:center; padding:40px;"><span class="material-icons-round" style="font-size:40px; animation: spin 1s linear infinite;">progress_activity</span></div>';
+
+    let query = db.collection('madrassas');
+    if (app.user.role === 'director') {
+      query = query.where('ownerId', '==', app.user.uid);
+    }
+
+    const snapshot = await query.get();
+    if (snapshot.empty) {
+      container.innerHTML = `<div style="text-align:center; padding:40px; color: var(--on-surface-variant);">
+        <span class="material-icons-round" style="font-size:48px;">search_off</span>
+        <p>Aucune madrassa trouvée</p>
+      </div>`;
+      return;
+    }
+
+    let html = '';
+    snapshot.forEach(doc => {
+      const m = doc.data();
+      let distText = '';
+      if (app.userLocation && m.location) {
+        const R = 6371;
+        const dLat = (m.location.latitude - app.userLocation.lat) * Math.PI / 180;
+        const dLon = (m.location.longitude - app.userLocation.lng) * Math.PI / 180;
+        const a = Math.sin(dLat/2)**2 + Math.cos(app.userLocation.lat * Math.PI / 180) * Math.cos(m.location.latitude * Math.PI / 180) * Math.sin(dLon/2)**2;
+        const dist = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        distText = `<span class="chip outlined"><span class="material-icons-round" style="font-size:14px; margin-right:4px;">near_me</span>${dist.toFixed(1)} km</span>`;
+      }
+
+      html += `
+        <div class="card" onclick="app.showMadrassaDetail('${doc.id}')">
+          <div class="row">
+            <div style="background: var(--primary-container); color: #003831; width: 48px; height: 48px; border-radius: 12px; display:flex; align-items:center; justify-content:center;">
+              <span class="material-icons-round">mosque</span>
+            </div>
+            <div class="col flex-1">
+              <div style="font-weight: 500; font-size: 16px;">${m.name}</div>
+              <div class="text-subtitle">${m.city} • ${m.founder}</div>
+            </div>
+          </div>
+          <div style="margin-top: 12px; display: flex; flex-wrap: wrap;">
+            ${distText}
+            <span class="chip outlined">${m.schedule || 'Horaires N/C'}</span>
+            <span class="chip outlined">${m.fees || 'Tarifs N/C'}</span>
+          </div>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+  },
+
+  showMadrassaDetail: async (id) => {
+    app.currentMadrassaId = id;
+    const doc = await db.collection('madrassas').doc(id).get();
+    const m = doc.data();
+    
+    document.getElementById('detail-title').textContent = m.name;
+    document.getElementById('detail-content').innerHTML = `
+      <div class="card">
+        <div class="row" style="margin-bottom: 12px;">
+          <span class="material-icons-round" style="color: var(--primary);">person</span>
+          <div class="col">
+            <div class="text-caption">Fondateur</div>
+            <div style="font-weight: 500;">${m.founder}</div>
+          </div>
+        </div>
+        <div class="row" style="margin-bottom: 12px;">
+          <span class="material-icons-round" style="color: var(--primary);">schedule</span>
+          <div class="col">
+            <div class="text-caption">Horaires</div>
+            <div style="font-weight: 500;">${m.schedule}</div>
+          </div>
+        </div>
+        <div class="row" style="margin-bottom: 12px;">
+          <span class="material-icons-round" style="color: var(--primary);">payments</span>
+          <div class="col">
+            <div class="text-caption">Tarifs</div>
+            <div style="font-weight: 500;">${m.fees}</div>
+          </div>
+        </div>
+        ${m.whatsapp ? `
+        <div class="row">
+          <span class="material-icons-round" style="color: var(--primary);">whatsapp</span>
+          <div class="col">
+            <div class="text-caption">Contact</div>
+            <a href="https://wa.me/${m.whatsapp.replace(/\D/g,'')}" style="color: var(--primary); text-decoration: none; font-weight: 500;">${m.whatsapp}</a>
+          </div>
+        </div>` : ''}
+      </div>
+
+      <div class="text-caption" style="margin: 16px 0 8px; font-weight: 500; text-transform: uppercase;">Filières</div>
+      <div class="card">
+        ${m.tracks ? m.tracks.split(',').map(t => `<span class="chip">${t.trim()}</span>`).join('') : 'Non spécifié'}
+      </div>
+
+      <div class="text-caption" style="margin: 16px 0 8px; font-weight: 500; text-transform: uppercase;">Règlement intérieur</div>
+      <div class="card" style="font-size: 14px; line-height: 1.5; white-space: pre-wrap; color: var(--on-surface-variant);">
+        ${m.regulations || 'Non spécifié'}
+      </div>
+
+      ${m.teachers && m.teachers.length > 0 ? `
+      <div class="text-caption" style="margin: 16px 0 8px; font-weight: 500; text-transform: uppercase;">Corps enseignant</div>
+      ${m.teachers.map(t => `
+        <div class="card" style="padding: 12px 16px;">
+          <div class="row">
+            <span class="material-icons-round" style="color: var(--primary);">school</span>
+            <span style="font-weight: 500;">${t}</span>
+          </div>
+        </div>
+      `).join('')}
+      ` : ''}
+
+      ${m.alumni && m.alumni.length > 0 ? `
+      <div class="text-caption" style="margin: 16px 0 8px; font-weight: 500; text-transform: uppercase;">Anciens élèves populaires</div>
+      ${m.alumni.map(a => `
+        <div class="card" style="padding: 12px 16px;">
+          <div class="row">
+            <span class="material-icons-round" style="color: #FFC107;">star</span>
+            <span style="font-weight: 500;">${a}</span>
+          </div>
+        </div>
+      `).join('')}
+      ` : ''}
+    `;
+    app.navigate('screen-madrassa-detail');
+  },
+
+  // --- Inscription Élève ---
+  enrollStudent: async () => {
+    const firstname = document.getElementById('s-firstname').value.trim();
+    const lastname = document.getElementById('s-lastname').value.trim();
+    const dob = document.getElementById('s-dob').value;
+    const parentPhone = document.getElementById('s-parent-phone').value;
+    const accept = document.getElementById('s-accept').checked;
+
+    if (!firstname || !lastname || !dob || !parentPhone) return app.showSnackbar('Champs obligatoires manquants');
+    if (!accept) return app.showSnackbar('Vous devez accepter le règlement');
+
+    try {
+      // Génération du code unique : PRENOM + 4 chiffres + lettre
+      const count = (await db.collection('students').get()).size + 1;
+      const letter = String.fromCharCode(97 + Math.floor(Math.random() * 26));
+      const uniqueCode = `${firstname.substring(0, 6).toUpperCase()}${String(count).padStart(4, '0')}${letter}`;
+
+      await db.collection('students').add({
+        firstname, lastname, dob,
+        gender: document.getElementById('s-gender').value,
+        availability: document.getElementById('s-availability').value,
+        level: document.getElementById('s-level').value,
+        parentPhone,
+        madrassaId: app.currentMadrassaId,
+        uniqueCode,
+        parentId: app.user.uid,
+        isAccepted: false,
+        paymentStatus: 'credit',
+        moralQualities: [],
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      // Afficher le modal de succès (simulé par un contenu spécial)
+      document.getElementById('detail-content').innerHTML = `
+        <div style="text-align: center; padding: 40px 20px;">
+          <span class="material-icons-round" style="font-size: 64px; color: var(--primary);">check_circle</span>
+          <h2 style="margin: 16px 0 8px; color: var(--primary);">Inscription réussie !</h2>
+          <p style="color: var(--on-surface-variant); margin-bottom: 24px;">Votre enfant a été inscrit. Voici son code unique d'identification :</p>
+          <div class="code-box">${uniqueCode}</div>
+          <p style="font-size: 13px; color: var(--error); margin-bottom: 24px;">⚠️ Conservez précieusement ce code. Il vous permettra de vous reconnecter en cas de changement de téléphone.</p>
+          <p style="color: var(--on-surface-variant);">Le directeur examinera la demande d'inscription.</p>
+          <button class="btn btn-primary" style="margin-top: 24px;" onclick="app.navigate('screen-home')">Retour à l'accueil</button>
+        </div>
+      `;
+    } catch (e) {
+      app.showSnackbar('Erreur: ' + e.message);
+    }
+  },
+
+  // --- Gestion des élèves (Directeur) ---
+  loadStudents: async () => {
+    const container = document.getElementById('students-content');
+    container.innerHTML = '<div style="text-align:center; padding:40px;"><span class="material-icons-round" style="font-size:40px; animation: spin 1s linear infinite;">progress_activity</span></div>';
+    
+    const mSnap = await db.collection('madrassas').where('ownerId', '==', app.user.uid).get();
+    if (mSnap.empty) return container.innerHTML = '<div style="padding:24px; text-align:center;">Créez d\'abord une madrassa</div>';
+    
+    const mId = mSnap.docs[0].id;
+    const snapshot = await db.collection('students').where('madrassaId', '==', mId).get();
+    
+    if (snapshot.empty) {
+      container.innerHTML = '<div style="text-align:center; padding:40px; color: var(--on-surface-variant);"><span class="material-icons-round" style="font-size:48px;">group_off</span><p>Aucun élève inscrit</p></div>';
+      return;
+    }
+
+    let html = '';
+    snapshot.forEach(doc => {
+      const s = doc.data();
+      const statusColors = { paid: '#4CAF50', credit: '#F44336', advance: '#2196F3', installment: '#FF9800' };
+      const statusLabels = { paid: 'Payé', credit: 'Crédit', advance: 'Avance', installment: 'Tranche' };
+      
+      html += `
+        <div class="card" onclick="app.showStudentDetail('${doc.id}')">
+          <div class="row">
+            <div style="background: ${statusColors[s.paymentStatus]}; color: white; width: 40px; height: 40px; border-radius: 50%; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:12px;">
+              ${s.firstname[0]}${s.lastname[0]}
+            </div>
+            <div class="col flex-1">
+              <div style="font-weight: 500;">${s.firstname} ${s.lastname}</div>
+              <div class="text-caption" style="font-family: monospace; color: var(--primary); font-weight: 600;">${s.uniqueCode}</div>
+            </div>
+            <span class="chip" style="background: ${statusColors[s.paymentStatus]}20; color: ${statusColors[s.paymentStatus]};">
+              ${statusLabels[s.paymentStatus]}
+            </span>
+          </div>
+          ${!s.isAccepted ? '<div style="margin-top:12px; padding:8px; background:#FFEBEE; color:#C62828; border-radius:8px; font-size:12px; display:flex; align-items:center; gap:8px;"><span class="material-icons-round" style="font-size:16px;">pending</span> En attente d\'acceptation</div>' : ''}
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+  },
+
+  showStudentDetail: async (id) => {
+    app.currentStudentId = id;
+    const doc = await db.collection('students').doc(id).get();
+    const s = doc.data();
+    
+    document.getElementById('student-detail-name').textContent = `${s.firstname} ${s.lastname}`;
+    
+    const qualities = ['Ponctuel', 'Disponible', 'Retard', 'Absence', 'Perturbations', 'Timidité', 'Exceptionnel', 'Bien', 'Très bien'];
+    
+    document.getElementById('student-detail-content').innerHTML = `
+      <div class="card">
+        <div class="row" style="margin-bottom:12px;">
+          <span class="material-icons-round" style="color:var(--primary);">badge</span>
+          <div class="col"><div class="text-caption">Code unique</div><div style="font-family:monospace; font-weight:700; font-size:18px; color:var(--primary);">${s.uniqueCode}</div></div>
+        </div>
+        <div class="row" style="margin-bottom:12px;">
+          <span class="material-icons-round" style="color:var(--primary);">cake</span>
+          <div class="col"><div class="text-caption">Né(e) le</div><div>${s.dob}</div></div>
+        </div>
+        <div class="row" style="margin-bottom:12px;">
+          <span class="material-icons-round" style="color:var(--primary);">phone</span>
+          <div class="col"><div class="text-caption">Parent</div><div>${s.parentPhone}</div></div>
+        </div>
+        <div class="row">
+          <span class="material-icons-round" style="color:var(--primary);">payments</span>
+          <div class="col flex-1">
+            <div class="text-caption">Statut paiement</div>
+            <select onchange="app.updatePayment('${id}', this.value)" style="padding:8px; border-radius:8px; border:1px solid var(--outline); margin-top:4px; font-family:'Roboto';">
+              <option value="paid" ${s.paymentStatus==='paid'?'selected':''}>Payé</option>
+              <option value="credit" ${s.paymentStatus==='credit'?'selected':''}>Crédit</option>
+              <option value="advance" ${s.paymentStatus==='advance'?'selected':''}>Avance</option>
+              <option value="installment" ${s.paymentStatus==='installment'?'selected':''}>Par tranche</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-caption" style="margin:16px 0 8px; font-weight:500; text-transform:uppercase;">Qualités morales (Appuyez pour modifier)</div>
+      <div class="card" style="display:flex; flex-wrap:wrap; gap:8px;">
+        ${qualities.map(q => `
+          <span class="chip ${(s.moralQualities||[]).includes(q) ? '' : 'outlined'}" 
+                onclick="app.toggleQuality('${id}', '${q}', this)" 
+                style="cursor:pointer;">
+            ${q}
+          </span>
+        `).join('')}
+      </div>
+
+      <div style="padding:16px; display:flex; flex-direction:column; gap:12px;">
+        ${!s.isAccepted ? `
+          <button class="btn btn-primary" onclick="app.acceptStudent('${id}')">
+            <span class="material-icons-round">check</span> Accepter l'élève
+          </button>
+        ` : `
+          <div style="background:#E8F5E9; color:#2E7D32; padding:12px; border-radius:8px; text-align:center; font-weight:500; display:flex; align-items:center; justify-content:center; gap:8px;">
+            <span class="material-icons-round">check_circle</span> Élève accepté
+          </div>
+        `}
+        <button class="btn btn-secondary" onclick="app.showDiplomaModal('${id}')">
+          <span class="material-icons-round">workspace_premium</span> Attribuer un diplôme
+        </button>
+        <button class="btn btn-secondary" onclick="app.showConvocationModal('${id}')">
+          <span class="material-icons-round">mail</span> Envoyer une convocation
+        </button>
+      </div>
+    `;
+    app.navigate('screen-student-detail');
+  },
+
+  updatePayment: async (id, status) => {
+    await db.collection('students').doc(id).update({ paymentStatus: status });
+    app.showSnackbar('Statut mis à jour');
+  },
+
+  toggleQuality: async (id, quality, el) => {
+    const doc = await db.collection('students').doc(id).get();
+    let qList = doc.data().moralQualities || [];
+    if (qList.includes(quality)) {
+      qList = qList.filter(q => q !== quality);
+      el.classList.add('outlined');
+    } else {
+      qList.push(quality);
+      el.classList.remove('outlined');
+    }
+    await db.collection('students').doc(id).update({ moralQualities: qList });
+  },
+
+  acceptStudent: async (id) => {
+    await db.collection('students').doc(id).update({ isAccepted: true });
+    app.showSnackbar('Élève accepté !');
+    app.showStudentDetail(id);
+  },
+
+  showDiplomaModal: (id) => {
+    const html = `
+      <div style="padding:24px; background:var(--surface); border-radius:28px; width:100%; max-width:400px; margin:auto;">
+        <h3 style="margin-bottom:16px; color:var(--primary);">Attribuer un diplôme</h3>
+        <div class="input-group"><label>Titre</label><input type="text" id="d-title" placeholder="Ex: Certificat de mémorisation"></div>
+        <div class="input-group"><label>Description</label><textarea id="d-desc" rows="3"></textarea></div>
+        <div class="input-group"><label>Date</label><input type="date" id="d-date" value="${new Date().toISOString().split('T')[0]}"></div>
+        <button class="btn btn-primary" onclick="app.saveDiploma('${id}')">Attribuer</button>
+        <button class="btn btn-secondary" style="margin-top:8px;" onclick="document.getElementById('modal-overlay').style.display='none'">Annuler</button>
+      </div>
+    `;
+    app.showModal(html);
+  },
+
+  saveDiploma: async (studentId) => {
+    const title = document.getElementById('d-title').value;
+    if (!title) return app.showSnackbar('Titre requis');
+    await db.collection('diplomas').add({
+      studentId, title,
+      description: document.getElementById('d-desc').value,
+      date: document.getElementById('d-date').value,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    document.getElementById('modal-overlay').style.display = 'none';
+    app.showSnackbar('Diplôme attribué !');
+  },
+
+  showConvocationModal: (id) => {
+    const html = `
+      <div style="padding:24px; background:var(--surface); border-radius:28px; width:100%; max-width:400px; margin:auto;">
+        <h3 style="margin-bottom:16px; color:var(--primary);">Nouvelle convocation</h3>
+        <div class="input-group"><label>Objet</label><input type="text" id="c-subject" placeholder="Ex: Réunion parents"></div>
+        <div class="input-group"><label>Date et heure</label><input type="datetime-local" id="c-date"></div>
+        <div class="input-group"><label>Lieu</label><input type="text" id="c-place"></div>
+        <div class="input-group"><label>Message</label><textarea id="c-message" rows="3"></textarea></div>
+        <button class="btn btn-primary" onclick="app.saveConvocation('${id}')">Envoyer</button>
+        <button class="btn btn-secondary" style="margin-top:8px;" onclick="document.getElementById('modal-overlay').style.display='none'">Annuler</button>
+      </div>
+    `;
+    app.showModal(html);
+  },
+
+  saveConvocation: async (studentId) => {
+    const subject = document.getElementById('c-subject').value;
+    if (!subject) return app.showSnackbar('Objet requis');
+    await db.collection('convocations').add({
+      studentId, subject,
+      date: document.getElementById('c-date').value,
+      place: document.getElementById('c-place').value,
+      message: document.getElementById('c-message').value,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    document.getElementById('modal-overlay').style.display = 'none';
+    app.showSnackbar('Convocation envoyée !');
+  },
+
+  showModal: (html) => {
+    let modal = document.getElementById('modal-overlay');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'modal-overlay';
+      modal.style.cssText = 'position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:2000; display:flex; align-items:center; justify-content:center; padding:16px;';
+      document.body.appendChild(modal);
+    }
+    modal.innerHTML = html;
+    modal.style.display = 'flex';
+  },
+
+  // --- Tableau de bord Parent ---
+  loadParentDashboard: async () => {
+    const container = document.getElementById('parent-content');
+    const snapshot = await db.collection('students').where('parentId', '==', app.user.uid).get();
+    
+    if (snapshot.empty) {
+      container.innerHTML = '<div style="text-align:center; padding:40px; color:var(--on-surface-variant);"><span class="material-icons-round" style="font-size:48px;">child_care</span><p>Aucun enfant inscrit</p></div>';
+      return;
+    }
+
+    let html = '<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">';
+    const children = snapshot.docs.map(d => d.data());
+    const accepted = children.filter(c => c.isAccepted).length;
+    
+    html += `
+      <div class="card" style="text-align:center; background:var(--primary-container); color:#003831;">
+        <div style="font-size:32px; font-weight:700;">${children.length}</div>
+        <div class="text-caption" style="color:#004D40;">Inscrits</div>
+      </div>
+      <div class="card" style="text-align:center; background:#E8F5E9; color:#2E7D32;">
+        <div style="font-size:32px; font-weight:700;">${accepted}</div>
+        <div class="text-caption" style="color:#1B5E20;">Acceptés</div>
+      </div>
+    </div>`;
+
+    html += '<div class="text-caption" style="margin:16px 0 8px; font-weight:500; text-transform:uppercase;">Mes enfants</div>';
+    
+    for (const c of children) {
+      const diplomas = await db.collection('diplomas').where('studentId', '==', snapshot.docs.find(d => d.data().uniqueCode === c.uniqueCode).id).get();
+      const convocations = await db.collection('convocations').where('studentId', '==', snapshot.docs.find(d => d.data().uniqueCode === c.uniqueCode).id).get();
+
+      html += `
+        <div class="card">
+          <div class="row" style="margin-bottom:12px;">
+            <div style="background:var(--primary); color:white; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold;">
+              ${c.firstname[0]}
+            </div>
+            <div class="col flex-1">
+              <div style="font-weight:500;">${c.firstname} ${c.lastname}</div>
+              <div class="text-caption" style="font-family:monospace; color:var(--primary);">${c.uniqueCode}</div>
+            </div>
+            <span class="chip" style="background:${c.isAccepted ? '#E8F5E9' : '#FFEBEE'}; color:${c.isAccepted ? '#2E7D32' : '#C62828'};">
+              ${c.isAccepted ? 'Accepté' : 'En attente'}
+            </span>
+          </div>
+          
+          <div class="divider"></div>
+          
+          <div class="row" style="margin-bottom:8px;">
+            <span class="material-icons-round" style="font-size:20px; color:var(--primary);">workspace_premium</span>
+            <span style="font-size:14px;">${diplomas.size} diplôme(s) obtenu(s)</span>
+          </div>
+          <div class="row">
+            <span class="material-icons-round" style="font-size:20px; color:var(--primary);">mail</span>
+            <span style="font-size:14px;">${convocations.size} convocation(s) reçue(s)</span>
+          </div>
+        </div>
+      `;
+    }
+    container.innerHTML = html;
+  }
+};
+
+// Animation CSS pour le spinner
+const style = document.createElement('style');
+style.textContent = `@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`;
+document.head.appendChild(style);
+
+// Écouteur d'état de connexion
+auth.onAuthStateChanged(async (user) => {
+  if (user) {
+    const doc = await db.collection('users').doc(user.uid).get();
+    if (doc.exists) {
+      app.user = { uid: user.uid, ...doc.data() };
+      app.setupUI();
+    }
+  } else {
+    app.navigate('screen-login');
+  }
+});
+</script>
+</body>
+</html>
