@@ -2,23 +2,22 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#00695C">
 <meta name="mobile-web-app-capable" content="yes">
 <title>Madrassa Manager</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-
-<!-- Firebase SDK (Compat) -->
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
-
-<!-- Bibliothèques pour le PDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <style>
+/* ==========================================
+   DESIGN SYSTEM FLUTTER (Material Design 3)
+   ========================================== */
 :root {
   --primary: #00695C;
   --primary-dark: #004D40;
@@ -29,33 +28,63 @@
   --on-surface: #1C1B1F;
   --on-surface-variant: #49454F;
   --outline: #79747E;
+  --error: #B3261E;
   --gold: #D4AF37;
   --shadow: rgba(0,0,0,0.15);
 }
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { font-family: 'Roboto', sans-serif; background: var(--background); color: var(--on-surface); height: 100vh; overflow-x: hidden; }
-.scaffold { display: none; flex-direction: column; height: 100vh; animation: fadeIn 0.3s; }
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+body { font-family: 'Roboto', sans-serif; background: var(--background); color: var(--on-surface); height: 100vh; overflow-x: hidden; overscroll-behavior-y: none; }
+
+.scaffold { display: none; flex-direction: column; height: 100vh; animation: fadeIn 0.25s cubic-bezier(0.4, 0.0, 0.2, 1); }
 .scaffold.active { display: flex; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-.app-bar { background: var(--primary); color: var(--on-primary); padding: 16px; display: flex; align-items: center; gap: 16px; box-shadow: 0 2px 4px var(--shadow); }
+.app-bar { background: var(--primary); color: var(--on-primary); padding: 16px; padding-top: max(16px, env(safe-area-inset-top)); display: flex; align-items: center; gap: 16px; box-shadow: 0 1px 3px var(--shadow); z-index: 100; }
 .app-bar h1 { font-size: 20px; font-weight: 500; flex: 1; }
+.app-bar .material-icons-round { font-size: 24px; cursor: pointer; }
+
+.bottom-nav { background: var(--surface); display: flex; justify-content: space-around; padding: 8px 0 max(8px, env(safe-area-inset-bottom)); box-shadow: 0 -1px 3px var(--shadow); z-index: 100; }
+.nav-item { display: flex; flex-direction: column; align-items: center; padding: 4px 16px; color: var(--on-surface-variant); cursor: pointer; transition: all 0.2s; }
+.nav-item.active { color: var(--primary); }
+.nav-item.active .material-icons-round { font-variation-settings: 'FILL' 1; }
+.nav-item span { font-size: 12px; font-weight: 500; margin-top: 4px; }
+
 .content { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 80px; }
 
-.btn { width: 100%; padding: 14px; border: none; border-radius: 20px; font-size: 14px; font-weight: 500; cursor: pointer; margin: 8px 0; display: flex; align-items: center; justify-content: center; gap: 8px; text-transform: uppercase; }
-.btn-primary { background: var(--primary); color: white; box-shadow: 0 1px 3px var(--shadow); }
-.btn-secondary { background: transparent; border: 1px solid var(--outline); color: var(--primary); }
-.btn-gold { background: var(--gold); color: #000; font-weight: 700; }
+.card { background: var(--surface); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 1px 3px 1px rgba(0,0,0,0.15); cursor: pointer; transition: transform 0.1s; }
+.card:active { transform: scale(0.98); }
+
+.fab { position: fixed; bottom: max(24px, calc(env(safe-area-inset-bottom) + 70px)); right: 16px; width: 56px; height: 56px; border-radius: 16px; background: var(--primary-container); color: #003831; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px 3px var(--shadow); cursor: pointer; z-index: 90; border: none; }
+.fab .material-icons-round { font-size: 24px; }
 
 .input-group { margin-bottom: 16px; position: relative; }
 .input-group label { position: absolute; left: 12px; top: -8px; background: var(--background); padding: 0 4px; font-size: 12px; color: var(--primary); font-weight: 500; }
-.input-group input, .input-group select { width: 100%; padding: 14px; border: 1px solid var(--outline); border-radius: 4px; font-size: 16px; background: var(--surface); outline: none; }
-.input-group input:focus { border: 2px solid var(--primary); padding: 13px; }
+.input-group input, .input-group select, .input-group textarea { width: 100%; padding: 14px 12px; border: 1px solid var(--outline); border-radius: 4px; font-size: 16px; background: var(--surface); font-family: 'Roboto', sans-serif; outline: none; transition: border-color 0.2s; }
+.input-group input:focus, .input-group select:focus, .input-group textarea:focus { border: 2px solid var(--primary); padding: 13px 11px; }
 
-.card { background: var(--surface); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px var(--shadow); cursor: pointer; transition: transform 0.1s; }
-.card:active { transform: scale(0.98); }
+.btn { width: 100%; padding: 14px; border: none; border-radius: 20px; font-size: 14px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-primary { background: var(--primary); color: var(--on-primary); box-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+.btn-primary:active { background: var(--primary-dark); }
+.btn-secondary { background: transparent; color: var(--primary); border: 1px solid var(--outline); }
+.btn-gold { background: var(--gold); color: #000; font-weight: 700; }
 
-/* Style du Diplôme */
+.chip { display: inline-flex; align-items: center; padding: 6px 12px; border-radius: 8px; background: var(--primary-container); color: #003831; font-size: 12px; font-weight: 500; margin: 4px 4px 4px 0; }
+.chip.outlined { background: transparent; border: 1px solid var(--outline); color: var(--on-surface-variant); }
+.chip.selected { background: var(--primary); color: white; }
+
+.snackbar { position: fixed; bottom: max(24px, calc(env(safe-area-inset-bottom) + 70px)); left: 16px; right: 16px; background: #322F35; color: #F4EFF4; padding: 14px 16px; border-radius: 4px; font-size: 14px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 3px 5px -1px rgba(0,0,0,0.2); transform: translateY(100px); opacity: 0; transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); z-index: 1000; }
+.snackbar.show { transform: translateY(0); opacity: 1; }
+
+.row { display: flex; align-items: center; gap: 12px; }
+.col { display: flex; flex-direction: column; }
+.flex-1 { flex: 1; }
+.text-subtitle { font-size: 14px; color: var(--on-surface-variant); margin-top: 4px; }
+.text-caption { font-size: 12px; color: var(--on-surface-variant); }
+.divider { height: 1px; background: var(--outline); opacity: 0.3; margin: 16px 0; }
+.code-box { background: #E0F2F1; border: 1px dashed var(--primary); border-radius: 8px; padding: 16px; text-align: center; font-family: monospace; font-size: 20px; font-weight: 700; color: var(--primary); letter-spacing: 2px; margin: 16px 0; }
+
+/* Style du Diplôme pour le PDF */
 .diploma-container { background: white; max-width: 800px; margin: 0 auto; padding: 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border: 4px double var(--gold); position: relative; }
 .diploma-title { font-size: 36px; font-weight: 700; color: var(--primary-dark); text-align: center; margin: 20px 0; font-family: 'Times New Roman', serif; letter-spacing: 2px; }
 .arabic-text { font-family: 'Amiri', serif; font-size: 28px; color: var(--gold); text-align: center; margin: 15px 0; direction: rtl; }
@@ -68,17 +97,18 @@ body { font-family: 'Roboto', sans-serif; background: var(--background); color: 
 .stat-label { font-size: 11px; color: var(--on-surface-variant); }
 .diploma-footer { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 40px; padding-top: 20px; border-top: 2px solid var(--gold); }
 .signature-line { border-top: 1px solid #333; width: 150px; margin: 30px auto 10px; }
-
-.snackbar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #322F35; color: white; padding: 14px 24px; border-radius: 8px; font-size: 14px; opacity: 0; transition: opacity 0.3s; z-index: 1000; pointer-events: none; }
-.snackbar.show { opacity: 1; }
 </style>
 </head>
 <body>
 
 <!-- ÉCRAN DE CONNEXION -->
-<div id="screen-login" class="scaffold active">
-  <div class="app-bar"><span class="material-icons-round">mosque</span><h1>Madrassa Manager</h1></div>
-  <div class="content" style="max-width: 400px; margin: 40px auto;">
+<div id="screen-login" class="scaffold active" style="background: var(--primary); justify-content: center; padding: 24px;">
+  <div style="text-align: center; color: white; margin-bottom: 40px;">
+    <span class="material-icons-round" style="font-size: 64px; margin-bottom: 16px;">mosque</span>
+    <h1 style="font-size: 28px; font-weight: 300;">Madrassa Manager</h1>
+    <p style="opacity: 0.8; margin-top: 8px;">Gestion des écoles coraniques</p>
+  </div>
+  <div style="background: var(--surface); border-radius: 28px 28px 0 0; padding: 24px 24px 40px; flex: 1; display: flex; flex-direction: column; justify-content: center;">
     <div class="input-group"><label>Adresse e-mail</label><input type="email" id="login-email" placeholder="exemple@gmail.com"></div>
     <div class="input-group"><label>Mot de passe</label><input type="password" id="login-password" placeholder="••••••••"></div>
     <button class="btn btn-primary" onclick="app.login()"><span class="material-icons-round">login</span> Se connecter</button>
@@ -89,9 +119,9 @@ body { font-family: 'Roboto', sans-serif; background: var(--background); color: 
 </div>
 
 <!-- ÉCRAN D'INSCRIPTION -->
-<div id="screen-register" class="scaffold">
-  <div class="app-bar"><span class="material-icons-round" onclick="app.navigate('screen-login')">arrow_back</span><h1>Inscription</h1></div>
-  <div class="content" style="max-width: 400px; margin: 40px auto;">
+<div id="screen-register" class="scaffold" style="background: var(--primary); justify-content: center; padding: 24px;">
+  <div style="background: var(--surface); border-radius: 28px; padding: 24px; width: 100%;">
+    <h2 style="margin-bottom: 24px; color: var(--primary);">Inscription</h2>
     <div class="input-group"><label>Nom complet</label><input type="text" id="reg-name"></div>
     <div class="input-group"><label>Adresse e-mail</label><input type="email" id="reg-email"></div>
     <div class="input-group"><label>Mot de passe</label><input type="password" id="reg-password" placeholder="Min. 6 caractères"></div>
@@ -99,51 +129,99 @@ body { font-family: 'Roboto', sans-serif; background: var(--background); color: 
       <select id="reg-role"><option value="parent">Parent d'élève</option><option value="director">Directeur de Madrassa</option></select>
     </div>
     <button class="btn btn-primary" onclick="app.register()">S'inscrire</button>
+    <button class="btn btn-secondary" style="margin-top: 12px;" onclick="app.navigate('screen-login')">Retour</button>
   </div>
 </div>
 
-<!-- ÉCRAN PRINCIPAL -->
+<!-- ÉCRAN PRINCIPAL (LISTE MADRASSAS) -->
 <div id="screen-home" class="scaffold">
   <div class="app-bar">
     <span class="material-icons-round" onclick="app.logout()">logout</span>
     <h1 id="home-title">Madrassas</h1>
+    <span class="material-icons-round" onclick="app.getLocation()">my_location</span>
   </div>
   <div class="content" id="home-content"></div>
-  <button class="btn btn-primary" id="btn-add-madrassa" style="display:none; position:fixed; bottom:20px; right:20px; width:auto; border-radius:16px; box-shadow: 0 4px 8px var(--shadow);" onclick="app.showAddMadrassa()">
-    <span class="material-icons-round">add</span> Ajouter
-  </button>
+  <button class="fab" id="fab-add-madrassa" onclick="app.navigate('screen-add-madrassa')" style="display: none;"><span class="material-icons-round">add</span></button>
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="app.navigate('screen-home')"><span class="material-icons-round">home</span><span>Accueil</span></div>
+    <div class="nav-item" onclick="app.navigate('screen-students')" id="nav-students" style="display: none;"><span class="material-icons-round">school</span><span>Élèves</span></div>
+    <div class="nav-item" onclick="app.navigate('screen-parent-dashboard')" id="nav-parent" style="display: none;"><span class="material-icons-round">dashboard</span><span>Suivi</span></div>
+  </div>
 </div>
 
 <!-- ÉCRAN AJOUT MADRASSA -->
 <div id="screen-add-madrassa" class="scaffold">
   <div class="app-bar"><span class="material-icons-round" onclick="app.navigate('screen-home')">arrow_back</span><h1>Nouvelle Madrassa</h1></div>
-  <div class="content" style="max-width: 500px; margin: 0 auto;">
+  <div class="content">
     <div class="input-group"><label>Nom *</label><input type="text" id="m-name"></div>
     <div class="input-group"><label>Ville *</label><input type="text" id="m-city"></div>
-    <div class="input-group"><label>Fondateur *</label><input type="text" id="m-founder"></div>
-    <div class="input-group"><label>Horaires</label><input type="text" id="m-schedule"></div>
-    <div class="input-group"><label>Tarifs</label><input type="text" id="m-fees"></div>
+    <div class="input-group"><label>Position GPS</label><input type="text" id="m-gps" placeholder="Appuyez sur le bouton ci-dessous" readonly></div>
+    <button class="btn btn-secondary" style="margin-bottom: 16px;" onclick="app.getLocation()"><span class="material-icons-round">gps_fixed</span> Capturer ma position</button>
+    <div class="input-group"><label>Horaires *</label><input type="text" id="m-schedule" placeholder="Ex: 8h-12h, 14h-18h"></div>
+    <div class="input-group"><label>Tarifs *</label><input type="text" id="m-fees" placeholder="Ex: 15000 FCFA/mois"></div>
+    <div class="input-group"><label>Règlement intérieur *</label><textarea id="m-regulations" rows="4"></textarea></div>
+    <div class="input-group"><label>Filières</label><input type="text" id="m-tracks" placeholder="Ex: Mémorisation, Tafsir"></div>
+    <div class="input-group"><label>Nom du fondateur *</label><input type="text" id="m-founder"></div>
+    <div class="input-group"><label>Oustazs (un par ligne)</label><textarea id="m-teachers" rows="3"></textarea></div>
+    <div class="input-group"><label>Anciens élèves populaires (un par ligne)</label><textarea id="m-alumni" rows="3"></textarea></div>
+    <div class="input-group"><label>Couleur de la tenue</label><input type="text" id="m-uniform"></div>
+    <div class="input-group"><label>WhatsApp</label><input type="tel" id="m-whatsapp"></div>
+    <div class="input-group"><label>Date de création</label><input type="date" id="m-date"></div>
     <button class="btn btn-primary" onclick="app.saveMadrassa()">Enregistrer</button>
   </div>
 </div>
 
-<!-- ÉCRAN LISTE ÉLÈVES -->
+<!-- ÉCRAN DÉTAIL MADRASSA -->
+<div id="screen-madrassa-detail" class="scaffold">
+  <div class="app-bar"><span class="material-icons-round" onclick="app.navigate('screen-home')">arrow_back</span><h1 id="detail-title">Détails</h1></div>
+  <div class="content" id="detail-content"></div>
+  <div style="padding: 16px; background: var(--surface); border-top: 1px solid var(--outline);">
+    <button class="btn btn-primary" onclick="app.navigate('screen-enroll')"><span class="material-icons-round">person_add</span> Inscrire mon enfant</button>
+  </div>
+</div>
+
+<!-- ÉCRAN INSCRIPTION ÉLÈVE -->
+<div id="screen-enroll" class="scaffold">
+  <div class="app-bar"><span class="material-icons-round" onclick="app.navigate('screen-madrassa-detail')">arrow_back</span><h1>Inscription</h1></div>
+  <div class="content">
+    <div class="input-group"><label>Nom *</label><input type="text" id="s-lastname"></div>
+    <div class="input-group"><label>Prénom *</label><input type="text" id="s-firstname"></div>
+    <div class="input-group"><label>Date de naissance *</label><input type="date" id="s-dob"></div>
+    <div class="input-group"><label>Sexe</label><select id="s-gender"><option value="M">Masculin</option><option value="F">Féminin</option></select></div>
+    <div class="input-group"><label>Disponibilité</label><select id="s-availability"><option>Matin uniquement</option><option>Après-midi uniquement</option><option>Journée complète</option></select></div>
+    <div class="input-group"><label>Niveau d'études</label><input type="text" id="s-level" placeholder="Ex: Débutant"></div>
+    <div class="input-group"><label>Téléphone du parent *</label><input type="tel" id="s-parent-phone"></div>
+    <label style="display:flex; align-items:center; gap:12px; margin:16px 0; cursor:pointer;">
+      <input type="checkbox" id="s-accept" style="width:18px; height:18px; accent-color:var(--primary);">
+      <span>J'accepte les conditions et le règlement intérieur</span>
+    </label>
+    <button class="btn btn-primary" onclick="app.enrollStudent()">Confirmer l'inscription</button>
+  </div>
+</div>
+
+<!-- ÉCRAN LISTE ÉLÈVES (DIRECTEUR) -->
 <div id="screen-students" class="scaffold">
   <div class="app-bar"><span class="material-icons-round" onclick="app.navigate('screen-home')">arrow_back</span><h1>Mes Élèves</h1></div>
   <div class="content" id="students-content"></div>
 </div>
 
-<!-- ÉCRAN DIPLÔME -->
-<div id="screen-diploma" class="scaffold">
+<!-- ÉCRAN DÉTAIL ÉLÈVE & DIPLÔME -->
+<div id="screen-student-detail" class="scaffold">
   <div class="app-bar">
     <span class="material-icons-round" onclick="app.navigate('screen-students')">arrow_back</span>
-    <h1>Aperçu du Diplôme</h1>
-    <button class="btn btn-gold" style="width: auto; padding: 8px 16px; margin: 0;" onclick="app.generatePDF()">
-      <span class="material-icons-round">download</span> PDF
-    </button>
+    <h1 id="student-detail-name">Élève</h1>
+    <button class="btn btn-gold" style="width:auto; padding:8px 16px; margin:0;" onclick="app.generatePDF()"><span class="material-icons-round">download</span> PDF</button>
   </div>
-  <div class="content">
-    <div id="diploma-preview" class="diploma-container"></div>
+  <div class="content" id="student-detail-content"></div>
+</div>
+
+<!-- ÉCRAN TABLEAU DE BORD PARENT -->
+<div id="screen-parent-dashboard" class="scaffold">
+  <div class="app-bar"><span class="material-icons-round" onclick="app.navigate('screen-home')">arrow_back</span><h1>Suivi de l'enfant</h1></div>
+  <div class="content" id="parent-content"></div>
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="app.navigate('screen-home')"><span class="material-icons-round">home</span><span>Accueil</span></div>
+    <div class="nav-item active" onclick="app.navigate('screen-parent-dashboard')"><span class="material-icons-round">dashboard</span><span>Suivi</span></div>
   </div>
 </div>
 
@@ -151,7 +229,7 @@ body { font-family: 'Roboto', sans-serif; background: var(--background); color: 
 
 <script>
 // ==========================================
-// CONFIGURATION FIREBASE (MISE À JOUR)
+// CONFIGURATION FIREBASE
 // ==========================================
 const firebaseConfig = {
   apiKey: "AIzaSyDPgj4JhIuOCyQfHRkjZEj4C8IUZEg380s",
@@ -168,14 +246,16 @@ const auth = firebase.auth();
 
 const app = {
   user: null,
-  currentStudent: null,
-  currentMadrassa: null,
+  currentMadrassaId: null,
+  currentStudentId: null,
+  userLocation: null,
 
-  navigate: (screen) => {
+  navigate: (screenId) => {
     document.querySelectorAll('.scaffold').forEach(s => s.classList.remove('active'));
-    document.getElementById(screen).classList.add('active');
-    if (screen === 'screen-home') app.loadHome();
-    if (screen === 'screen-students') app.loadStudents();
+    document.getElementById(screenId).classList.add('active');
+    if (screenId === 'screen-home') app.loadMadrassas();
+    if (screenId === 'screen-students') app.loadStudents();
+    if (screenId === 'screen-parent-dashboard') app.loadParentDashboard();
   },
 
   showSnackbar: (msg) => {
@@ -185,12 +265,12 @@ const app = {
     setTimeout(() => sb.classList.remove('show'), 3000);
   },
 
+  // --- Authentification ---
   register: async () => {
     const name = document.getElementById('reg-name').value.trim();
     const email = document.getElementById('reg-email').value.trim();
     const password = document.getElementById('reg-password').value;
     const role = document.getElementById('reg-role').value;
-
     if (!name || !email || !password) return app.showSnackbar('⚠️ Remplissez tous les champs');
     if (password.length < 6) return app.showSnackbar('⚠️ Mot de passe : 6 caractères min.');
 
@@ -199,7 +279,7 @@ const app = {
       await db.collection('users').doc(cred.user.uid).set({ name, email, role, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
       app.user = { uid: cred.user.uid, name, email, role };
       app.showSnackbar('✅ Compte créé !');
-      app.navigate('screen-home');
+      app.setupUI();
     } catch (e) {
       console.error(e);
       app.showSnackbar('❌ ' + (e.code === 'auth/email-already-in-use' ? 'Email déjà utilisé' : e.message));
@@ -216,7 +296,7 @@ const app = {
       const doc = await db.collection('users').doc(cred.user.uid).get();
       app.user = { uid: cred.user.uid, ...doc.data() };
       app.showSnackbar('✅ Connecté !');
-      app.navigate('screen-home');
+      app.setupUI();
     } catch (e) {
       console.error(e);
       app.showSnackbar('❌ Email ou mot de passe incorrect');
@@ -231,8 +311,7 @@ const app = {
       if (!doc.exists) {
         const role = prompt("Vous êtes : parent ou director ?") || 'parent';
         await db.collection('users').doc(result.user.uid).set({
-          name: result.user.displayName || 'Utilisateur',
-          email: result.user.email,
+          name: result.user.displayName || 'Utilisateur', email: result.user.email,
           role: role.toLowerCase().includes('direct') ? 'director' : 'parent',
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
@@ -240,7 +319,7 @@ const app = {
       }
       app.user = { uid: result.user.uid, ...doc.data() };
       app.showSnackbar('✅ Connecté avec Google !');
-      app.navigate('screen-home');
+      app.setupUI();
     } catch (e) {
       console.error(e);
       app.showSnackbar('❌ ' + e.message);
@@ -249,39 +328,35 @@ const app = {
 
   logout: () => { auth.signOut(); app.user = null; app.navigate('screen-login'); },
 
-  loadHome: async () => {
-    document.getElementById('home-title').textContent = app.user.role === 'director' ? 'Ma Madrassa' : 'Madrassas';
-    document.getElementById('btn-add-madrassa').style.display = app.user.role === 'director' ? 'flex' : 'none';
-    
-    const container = document.getElementById('home-content');
-    container.innerHTML = '<div style="text-align:center; padding:40px;"><span class="material-icons-round" style="font-size:40px; animation: spin 1s linear infinite;">progress_activity</span></div>';
-
-    try {
-      let query = db.collection('madrassas');
-      if (app.user.role === 'director') query = query.where('ownerId', '==', app.user.uid);
-      
-      const snapshot = await query.get();
-      if (snapshot.empty) {
-        container.innerHTML = `<div style="text-align:center; padding:40px;"><span class="material-icons-round" style="font-size:48px; color:var(--outline);">search_off</span><p style="margin-top:16px; color:var(--on-surface-variant);">Aucune madrassa trouvée</p></div>`;
-        return;
-      }
-
-      container.innerHTML = snapshot.docs.map(doc => {
-        const m = doc.data();
-        return `<div class="card" onclick="app.selectMadrassa('${doc.id}', '${m.name}')">
-          <div style="display:flex; align-items:center; gap:12px;">
-            <div style="background:var(--primary-container); color:var(--primary-dark); width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center;"><span class="material-icons-round">mosque</span></div>
-            <div><h3 style="font-size:16px;">${m.name}</h3><p style="font-size:13px; color:var(--on-surface-variant);">${m.city} • ${m.founder}</p></div>
-          </div>
-        </div>`;
-      }).join('');
-    } catch (e) {
-      container.innerHTML = `<div style="color:red; padding:20px;">Erreur: ${e.message}</div>`;
+  setupUI: () => {
+    if (app.user.role === 'director') {
+      document.getElementById('fab-add-madrassa').style.display = 'flex';
+      document.getElementById('nav-students').style.display = 'flex';
+      document.getElementById('nav-parent').style.display = 'none';
+    } else {
+      document.getElementById('fab-add-madrassa').style.display = 'none';
+      document.getElementById('nav-students').style.display = 'none';
+      document.getElementById('nav-parent').style.display = 'flex';
     }
+    app.navigate('screen-home');
   },
 
-  showAddMadrassa: () => app.navigate('screen-add-madrassa'),
+  // --- Géolocalisation ---
+  getLocation: () => {
+    if (!navigator.geolocation) return app.showSnackbar('Non supportée');
+    app.showSnackbar('Localisation...');
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        app.userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        const gpsInput = document.getElementById('m-gps');
+        if (gpsInput) gpsInput.value = `${app.userLocation.lat.toFixed(5)}, ${app.userLocation.lng.toFixed(5)}`;
+        app.showSnackbar('✅ Position capturée');
+      },
+      () => app.showSnackbar('❌ Autorisez la localisation')
+    );
+  },
 
+  // --- Madrassas ---
   saveMadrassa: async () => {
     const name = document.getElementById('m-name').value.trim();
     const city = document.getElementById('m-city').value.trim();
@@ -293,130 +368,354 @@ const app = {
         name, city, founder,
         schedule: document.getElementById('m-schedule').value,
         fees: document.getElementById('m-fees').value,
+        regulations: document.getElementById('m-regulations').value,
+        tracks: document.getElementById('m-tracks').value,
+        teachers: document.getElementById('m-teachers').value.split('\n').filter(x => x.trim()),
+        alumni: document.getElementById('m-alumni').value.split('\n').filter(x => x.trim()),
+        uniform: document.getElementById('m-uniform').value,
+        whatsapp: document.getElementById('m-whatsapp').value,
+        creationDate: document.getElementById('m-date').value,
+        location: app.userLocation ? new firebase.firestore.GeoPoint(app.userLocation.lat, app.userLocation.lng) : null,
         ownerId: app.user.uid,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
       app.showSnackbar('✅ Madrassa créée !');
       app.navigate('screen-home');
-    } catch (e) {
-      app.showSnackbar('❌ ' + e.message);
-    }
+    } catch (e) { app.showSnackbar('❌ ' + e.message); }
   },
 
-  selectMadrassa: (id, name) => {
-    app.currentMadrassa = { id, name };
-    app.navigate('screen-students');
+  loadMadrassas: async () => {
+    const container = document.getElementById('home-content');
+    container.innerHTML = '<div style="text-align:center; padding:40px;"><span class="material-icons-round" style="font-size:40px; animation: spin 1s linear infinite;">progress_activity</span></div>';
+
+    try {
+      let query = db.collection('madrassas');
+      if (app.user.role === 'director') query = query.where('ownerId', '==', app.user.uid);
+      
+      const snapshot = await query.get();
+      if (snapshot.empty) {
+        container.innerHTML = `<div style="text-align:center; padding:40px; color:var(--on-surface-variant);"><span class="material-icons-round" style="font-size:48px;">search_off</span><p>Aucune madrassa trouvée</p></div>`;
+        return;
+      }
+
+      let html = '';
+      snapshot.forEach(doc => {
+        const m = doc.data();
+        let distText = '';
+        if (app.userLocation && m.location) {
+          const R = 6371;
+          const dLat = (m.location.latitude - app.userLocation.lat) * Math.PI / 180;
+          const dLon = (m.location.longitude - app.userLocation.lng) * Math.PI / 180;
+          const a = Math.sin(dLat/2)**2 + Math.cos(app.userLocation.lat * Math.PI / 180) * Math.cos(m.location.latitude * Math.PI / 180) * Math.sin(dLon/2)**2;
+          const dist = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+          distText = `<span class="chip outlined"><span class="material-icons-round" style="font-size:14px; margin-right:4px;">near_me</span>${dist.toFixed(1)} km</span>`;
+        }
+
+        html += `
+          <div class="card" onclick="app.showMadrassaDetail('${doc.id}')">
+            <div class="row">
+              <div style="background: var(--primary-container); color: #003831; width: 48px; height: 48px; border-radius: 12px; display:flex; align-items:center; justify-content:center;"><span class="material-icons-round">mosque</span></div>
+              <div class="col flex-1">
+                <div style="font-weight: 500; font-size: 16px;">${m.name}</div>
+                <div class="text-subtitle">${m.city} • ${m.founder}</div>
+              </div>
+            </div>
+            <div style="margin-top: 12px; display: flex; flex-wrap: wrap;">
+              ${distText}
+              <span class="chip outlined">${m.schedule || 'Horaires N/C'}</span>
+              <span class="chip outlined">${m.fees || 'Tarifs N/C'}</span>
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    } catch (e) { container.innerHTML = `<div style="color:red; padding:20px;">Erreur: ${e.message}</div>`; }
   },
 
+  showMadrassaDetail: async (id) => {
+    app.currentMadrassaId = id;
+    try {
+      const doc = await db.collection('madrassas').doc(id).get();
+      const m = doc.data();
+      document.getElementById('detail-title').textContent = m.name;
+      document.getElementById('detail-content').innerHTML = `
+        <div class="card">
+          <div class="row" style="margin-bottom:12px;"><span class="material-icons-round" style="color:var(--primary);">person</span><div class="col"><div class="text-caption">Fondateur</div><div style="font-weight:500;">${m.founder}</div></div></div>
+          <div class="row" style="margin-bottom:12px;"><span class="material-icons-round" style="color:var(--primary);">schedule</span><div class="col"><div class="text-caption">Horaires</div><div style="font-weight:500;">${m.schedule || 'N/C'}</div></div></div>
+          <div class="row" style="margin-bottom:12px;"><span class="material-icons-round" style="color:var(--primary);">payments</span><div class="col"><div class="text-caption">Tarifs</div><div style="font-weight:500;">${m.fees || 'N/C'}</div></div></div>
+          <div class="row" style="margin-bottom:12px;"><span class="material-icons-round" style="color:var(--primary);">checkroom</span><div class="col"><div class="text-caption">Tenue</div><div style="font-weight:500;">${m.uniform || 'N/C'}</div></div></div>
+          <div class="row"><span class="material-icons-round" style="color:var(--primary);">calendar_today</span><div class="col"><div class="text-caption">Création</div><div style="font-weight:500;">${m.creationDate || 'N/C'}</div></div></div>
+          ${m.whatsapp ? `<div class="row" style="margin-top:12px;"><span class="material-icons-round" style="color:var(--primary);">whatsapp</span><div class="col"><div class="text-caption">Contact</div><a href="https://wa.me/${m.whatsapp.replace(/\D/g,'')}" style="color:var(--primary); text-decoration:none; font-weight:500;">${m.whatsapp}</a></div></div>` : ''}
+        </div>
+        <div class="text-caption" style="margin:16px 0 8px; font-weight:500; text-transform:uppercase;">Règlement intérieur</div>
+        <div class="card" style="font-size:14px; line-height:1.5; white-space:pre-wrap; color:var(--on-surface-variant);">${m.regulations || 'Non spécifié'}</div>
+        ${m.tracks ? `<div class="text-caption" style="margin:16px 0 8px; font-weight:500; text-transform:uppercase;">Filières</div><div class="card">${m.tracks.split(',').map(t => `<span class="chip">${t.trim()}</span>`).join('')}</div>` : ''}
+        ${m.teachers && m.teachers.length > 0 ? `<div class="text-caption" style="margin:16px 0 8px; font-weight:500; text-transform:uppercase;">Corps enseignant</div>${m.teachers.map(t => `<div class="card" style="padding:12px 16px;"><div class="row"><span class="material-icons-round" style="color:var(--primary);">school</span><span style="font-weight:500;">${t}</span></div></div>`).join('')}` : ''}
+        ${m.alumni && m.alumni.length > 0 ? `<div class="text-caption" style="margin:16px 0 8px; font-weight:500; text-transform:uppercase;">Anciens élèves populaires</div>${m.alumni.map(a => `<div class="card" style="padding:12px 16px;"><div class="row"><span class="material-icons-round" style="color:#FFC107;">star</span><span style="font-weight:500;">${a}</span></div></div>`).join('')}` : ''}
+      `;
+      app.navigate('screen-madrassa-detail');
+    } catch (e) { app.showSnackbar('❌ ' + e.message); }
+  },
+
+  // --- Inscription Élève ---
+  enrollStudent: async () => {
+    const firstname = document.getElementById('s-firstname').value.trim();
+    const lastname = document.getElementById('s-lastname').value.trim();
+    const dob = document.getElementById('s-dob').value;
+    const parentPhone = document.getElementById('s-parent-phone').value.trim();
+    const accept = document.getElementById('s-accept').checked;
+    if (!firstname || !lastname || !dob || !parentPhone) return app.showSnackbar('⚠️ Champs obligatoires manquants');
+    if (!accept) return app.showSnackbar('⚠️ Acceptez le règlement');
+
+    try {
+      const count = (await db.collection('students').get()).size + 1;
+      const letter = String.fromCharCode(97 + Math.floor(Math.random() * 26));
+      const uniqueCode = `${firstname.substring(0, 6).toUpperCase()}${String(count).padStart(4, '0')}${letter}`;
+
+      await db.collection('students').add({
+        firstname, lastname, dob,
+        gender: document.getElementById('s-gender').value,
+        availability: document.getElementById('s-availability').value,
+        level: document.getElementById('s-level').value,
+        parentPhone, madrassaId: app.currentMadrassaId,
+        uniqueCode, parentId: app.user.uid,
+        isAccepted: false, paymentStatus: 'credit', moralQualities: [],
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      document.getElementById('detail-content').innerHTML = `
+        <div style="text-align:center; padding:40px 20px;">
+          <span class="material-icons-round" style="font-size:64px; color:var(--primary);">check_circle</span>
+          <h2 style="margin:16px 0 8px; color:var(--primary);">Inscription réussie !</h2>
+          <p style="color:var(--on-surface-variant); margin-bottom:24px;">Code unique de votre enfant :</p>
+          <div class="code-box">${uniqueCode}</div>
+          <p style="font-size:13px; color:var(--error); margin-bottom:24px;">⚠️ Conservez ce code pour vous reconnecter.</p>
+          <button class="btn btn-primary" style="margin-top:24px;" onclick="app.navigate('screen-home')">Retour à l'accueil</button>
+        </div>
+      `;
+    } catch (e) { app.showSnackbar('❌ ' + e.message); }
+  },
+
+  // --- Gestion Élèves (Directeur) ---
   loadStudents: async () => {
     const container = document.getElementById('students-content');
     container.innerHTML = '<div style="text-align:center; padding:40px;"><span class="material-icons-round" style="font-size:40px; animation: spin 1s linear infinite;">progress_activity</span></div>';
     
     try {
-      const snapshot = await db.collection('students').where('madrassaId', '==', app.currentMadrassa.id).get();
+      const mSnap = await db.collection('madrassas').where('ownerId', '==', app.user.uid).get();
+      if (mSnap.empty) return container.innerHTML = '<div style="padding:24px; text-align:center;">Créez d\'abord une madrassa</div>';
+      
+      const mId = mSnap.docs[0].id;
+      const snapshot = await db.collection('students').where('madrassaId', '==', mId).get();
+      
       if (snapshot.empty) {
-        container.innerHTML = '<div style="text-align:center; padding:40px; color:var(--on-surface-variant);">Aucun élève inscrit pour le moment.</div>';
+        container.innerHTML = '<div style="text-align:center; padding:40px; color:var(--on-surface-variant);"><span class="material-icons-round" style="font-size:48px;">group_off</span><p>Aucun élève inscrit</p></div>';
         return;
       }
 
-      container.innerHTML = snapshot.docs.map(doc => {
+      let html = '';
+      snapshot.forEach(doc => {
         const s = doc.data();
-        return `<div class="card" onclick="app.showDiploma('${doc.id}')">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div>
-              <h3 style="font-size:16px;">${s.firstname} ${s.lastname}</h3>
-              <p style="font-size:12px; color:var(--primary); font-family:monospace;">Code: ${s.uniqueCode}</p>
+        const statusColors = { paid: '#4CAF50', credit: '#F44336', advance: '#2196F3', installment: '#FF9800' };
+        const statusLabels = { paid: 'Payé', credit: 'Crédit', advance: 'Avance', installment: 'Tranche' };
+        
+        html += `
+          <div class="card" onclick="app.showStudentDetail('${doc.id}')">
+            <div class="row">
+              <div style="background:${statusColors[s.paymentStatus]}; color:white; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:12px;">${s.firstname[0]}${s.lastname[0]}</div>
+              <div class="col flex-1">
+                <div style="font-weight:500;">${s.firstname} ${s.lastname}</div>
+                <div class="text-caption" style="font-family:monospace; color:var(--primary); font-weight:600;">${s.uniqueCode}</div>
+              </div>
+              <span class="chip" style="background:${statusColors[s.paymentStatus]}20; color:${statusColors[s.paymentStatus]};">${statusLabels[s.paymentStatus]}</span>
             </div>
-            <span class="material-icons-round" style="color: var(--gold); font-size: 28px;">workspace_premium</span>
+            ${!s.isAccepted ? '<div style="margin-top:12px; padding:8px; background:#FFEBEE; color:#C62828; border-radius:8px; font-size:12px; display:flex; align-items:center; gap:8px;"><span class="material-icons-round" style="font-size:16px;">pending</span> En attente</div>' : ''}
           </div>
-        </div>`;
-      }).join('');
-    } catch (e) {
-      container.innerHTML = `<div style="color:red; padding:20px;">Erreur: ${e.message}</div>`;
-    }
+        `;
+      });
+      container.innerHTML = html;
+    } catch (e) { container.innerHTML = `<div style="color:red; padding:20px;">Erreur: ${e.message}</div>`; }
   },
 
-  showDiploma: async (studentId) => {
-    const doc = await db.collection('students').doc(studentId).get();
-    const s = doc.data();
-    app.currentStudent = { id: studentId, ...s };
+  showStudentDetail: async (id) => {
+    app.currentStudentId = id;
+    try {
+      const doc = await db.collection('students').doc(id).get();
+      const s = doc.data();
+      document.getElementById('student-detail-name').textContent = `${s.firstname} ${s.lastname}`;
+      const qualities = ['Ponctuel', 'Disponible', 'Retard', 'Absence', 'Perturbations', 'Timidité', 'Exceptionnel', 'Bien', 'Très bien'];
+      
+      document.getElementById('student-detail-content').innerHTML = `
+        <div class="card">
+          <div class="row" style="margin-bottom:12px;"><span class="material-icons-round" style="color:var(--primary);">badge</span><div class="col"><div class="text-caption">Code unique</div><div style="font-family:monospace; font-weight:700; font-size:18px; color:var(--primary);">${s.uniqueCode}</div></div></div>
+          <div class="row" style="margin-bottom:12px;"><span class="material-icons-round" style="color:var(--primary);">cake</span><div class="col"><div class="text-caption">Né(e) le</div><div>${s.dob}</div></div></div>
+          <div class="row" style="margin-bottom:12px;"><span class="material-icons-round" style="color:var(--primary);">school</span><div class="col"><div class="text-caption">Niveau</div><div>${s.level || 'N/C'}</div></div></div>
+          <div class="row" style="margin-bottom:12px;"><span class="material-icons-round" style="color:var(--primary);">phone</span><div class="col"><div class="text-caption">Parent</div><div>${s.parentPhone}</div></div></div>
+          <div class="row"><span class="material-icons-round" style="color:var(--primary);">payments</span><div class="col flex-1"><div class="text-caption">Statut paiement</div><select onchange="app.updatePayment('${id}', this.value)" style="padding:8px; border-radius:8px; border:1px solid var(--outline); margin-top:4px; font-family:'Roboto';"><option value="paid" ${s.paymentStatus==='paid'?'selected':''}>Payé</option><option value="credit" ${s.paymentStatus==='credit'?'selected':''}>Crédit</option><option value="advance" ${s.paymentStatus==='advance'?'selected':''}>Avance</option><option value="installment" ${s.paymentStatus==='installment'?'selected':''}>Par tranche</option></select></div></div>
+        </div>
+        <div class="text-caption" style="margin:16px 0 8px; font-weight:500; text-transform:uppercase;">Qualités morales (Appuyez pour modifier)</div>
+        <div class="card" style="display:flex; flex-wrap:wrap; gap:8px;">
+          ${qualities.map(q => `<span class="chip ${(s.moralQualities||[]).includes(q) ? '' : 'outlined'}" onclick="app.toggleQuality('${id}', '${q}', this)" style="cursor:pointer;">${q}</span>`).join('')}
+        </div>
+        <div style="padding:16px; display:flex; flex-direction:column; gap:12px;">
+          ${!s.isAccepted ? `<button class="btn btn-primary" onclick="app.acceptStudent('${id}')"><span class="material-icons-round">check</span> Accepter l'élève</button>` : `<div style="background:#E8F5E9; color:#2E7D32; padding:12px; border-radius:8px; text-align:center; font-weight:500; display:flex; align-items:center; justify-content:center; gap:8px;"><span class="material-icons-round">check_circle</span> Élève accepté</div>`}
+          <button class="btn btn-secondary" onclick="app.showConvocationModal('${id}')"><span class="material-icons-round">mail</span> Envoyer une convocation</button>
+        </div>
+        <div id="diploma-preview" class="diploma-container" style="margin-top:20px;"></div>
+      `;
+      
+      // Générer le diplôme automatiquement dans le détail
+      app.renderDiploma(s);
+      app.navigate('screen-student-detail');
+    } catch (e) { app.showSnackbar('❌ ' + e.message); }
+  },
 
+  renderDiploma: (s) => {
     const diplomaHTML = `
       <div class="arabic-text">بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ</div>
       <h1 class="diploma-title">DIPLÔME CORANIQUE</h1>
       <p style="text-align:center; color:var(--on-surface-variant); margin-bottom:20px;">CERTIFICAT DE RÉUSSITE DANS L'ÉTUDE DU CORAN</p>
-      
-      <div style="text-align:center; margin: 30px 0;">
-        <p>Je soussigné(e) <strong>${app.user.name}</strong>, Directeur de la Madrassa <strong>${app.currentMadrassa.name}</strong>,</p>
+      <div style="text-align:center; margin:30px 0;">
+        <p>Je soussigné(e) <strong>${app.user.name}</strong>, Directeur,</p>
         <p style="margin-top:10px;">certifie par la présente que l'élève</p>
         <div class="student-name">${s.firstname} ${s.lastname}</div>
         <p style="margin-top:10px;">a satisfait avec succès aux exigences de mémorisation de</p>
       </div>
-
-      <div class="achievement-box">
-        <span class="hijub-number">${s.hijubCompleted || 6} HIJUB DU SAINT CORAN</span>
-      </div>
-
+      <div class="achievement-box"><span class="hijub-number">${s.hijubCompleted || 6} HIJUB DU SAINT CORAN</span></div>
       <div class="stats-grid">
         <div class="stat-item"><div class="stat-value">${s.hijubCompleted || 6} / 30</div><div class="stat-label">PARTIES MÉMORISÉES</div></div>
         <div class="stat-item"><div class="stat-value">Très Bien</div><div class="stat-label">APPRÉCIATION</div></div>
         <div class="stat-item"><div class="stat-value">${new Date().getFullYear()}</div><div class="stat-label">ANNÉE ACADÉMIQUE</div></div>
       </div>
-
-      <div class="arabic-text" style="font-size: 22px; margin: 20px 0;">وَرَتِّلِ الْقُرْآنَ تَرْتِيلًا</div>
-      <p style="text-align:center; font-size: 14px; color: var(--on-surface-variant); font-style:italic;">« Et récite le Coran avec une belle récitation. » (Sourate Al-Muzzammil : 73)</p>
-
+      <div class="arabic-text" style="font-size:22px; margin:20px 0;">وَرَتِّلِ الْقُرْآنَ تَرْتِيلًا</div>
+      <p style="text-align:center; font-size:14px; color:var(--on-surface-variant); font-style:italic;">« Et récite le Coran avec une belle récitation. » (Sourate Al-Muzzammil : 73)</p>
       <div class="diploma-footer">
-        <div style="text-align:center;">
-          <div style="font-size:12px; margin-bottom:40px;">Fait à _______________, le _______________</div>
-          <div class="signature-line"></div>
-          <strong>Le Directeur</strong>
-        </div>
-        <div style="text-align:right;">
-          <div style="border: 2px solid var(--gold); padding: 10px; border-radius: 8px; background: white;">
-            <div style="font-size: 10px; color: var(--on-surface-variant);">ID DIPLÔME</div>
-            <div style="font-size: 12px; font-weight: bold; font-family: monospace; color: var(--primary);">
-              MAD-${new Date().getFullYear()}-${studentId.substr(0,6).toUpperCase()}
-            </div>
-          </div>
-        </div>
+        <div style="text-align:center;"><div style="font-size:12px; margin-bottom:40px;">Fait à _______________, le _______________</div><div class="signature-line"></div><strong>Le Directeur</strong></div>
+        <div style="text-align:right;"><div style="border:2px solid var(--gold); padding:10px; border-radius:8px; background:white;"><div style="font-size:10px; color:var(--on-surface-variant);">ID DIPLÔME</div><div style="font-size:12px; font-weight:bold; font-family:monospace; color:var(--primary);">MAD-${new Date().getFullYear()}-${app.currentStudentId.substr(0,6).toUpperCase()}</div></div></div>
       </div>
     `;
-
     document.getElementById('diploma-preview').innerHTML = diplomaHTML;
-    app.navigate('screen-diploma');
-    window.scrollTo(0, 0);
+  },
+
+  updatePayment: async (id, status) => {
+    await db.collection('students').doc(id).update({ paymentStatus: status });
+    app.showSnackbar('✅ Statut mis à jour');
+  },
+
+  toggleQuality: async (id, quality, el) => {
+    const doc = await db.collection('students').doc(id).get();
+    let qList = doc.data().moralQualities || [];
+    if (qList.includes(quality)) { qList = qList.filter(q => q !== quality); el.classList.add('outlined'); } 
+    else { qList.push(quality); el.classList.remove('outlined'); }
+    await db.collection('students').doc(id).update({ moralQualities: qList });
+  },
+
+  acceptStudent: async (id) => {
+    await db.collection('students').doc(id).update({ isAccepted: true });
+    app.showSnackbar('✅ Élève accepté !');
+    app.showStudentDetail(id);
+  },
+
+  showConvocationModal: (id) => {
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:2000; display:flex; align-items:center; justify-content:center; padding:16px;';
+    modal.innerHTML = `
+      <div style="padding:24px; background:var(--surface); border-radius:28px; width:100%; max-width:400px; margin:auto;">
+        <h3 style="margin-bottom:16px; color:var(--primary);">Nouvelle convocation</h3>
+        <div class="input-group"><label>Objet</label><input type="text" id="c-subject"></div>
+        <div class="input-group"><label>Date et heure</label><input type="datetime-local" id="c-date"></div>
+        <div class="input-group"><label>Lieu</label><input type="text" id="c-place"></div>
+        <div class="input-group"><label>Message</label><textarea id="c-message" rows="3"></textarea></div>
+        <button class="btn btn-primary" onclick="app.saveConvocation('${id}', this)">Envoyer</button>
+        <button class="btn btn-secondary" style="margin-top:8px;" onclick="this.closest('div').remove()">Annuler</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  },
+
+  saveConvocation: async (studentId, btn) => {
+    const subject = document.getElementById('c-subject').value;
+    if (!subject) return app.showSnackbar('⚠️ Objet requis');
+    await db.collection('convocations').add({
+      studentId, subject,
+      date: document.getElementById('c-date').value,
+      place: document.getElementById('c-place').value,
+      message: document.getElementById('c-message').value,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    btn.closest('div').remove();
+    app.showSnackbar('✅ Convocation envoyée !');
   },
 
   generatePDF: async () => {
-    if (!app.currentStudent) return;
+    if (!app.currentStudentId) return;
     try {
-      app.showSnackbar('Génération du PDF en cours...');
+      app.showSnackbar('Génération du PDF...');
       const { jsPDF } = window.jspdf;
       const diplomaElement = document.getElementById('diploma-preview');
-      
       const canvas = await html2canvas(diplomaElement, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
       const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('l', 'mm', 'a4'); // Paysage
-      
+      const pdf = new jsPDF('l', 'mm', 'a4');
       const imgWidth = 297;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
       
-      const filename = `Diplome_${app.currentStudent.firstname}_${app.currentStudent.lastname}.pdf`;
-      pdf.save(filename);
+      const doc = await db.collection('students').doc(app.currentStudentId).get();
+      const s = doc.data();
+      pdf.save(`Diplome_${s.firstname}_${s.lastname}.pdf`);
       
       await db.collection('diplomas').add({
-        studentId: app.currentStudent.id,
-        studentName: `${app.currentStudent.firstname} ${app.currentStudent.lastname}`,
+        studentId: app.currentStudentId,
+        studentName: `${s.firstname} ${s.lastname}`,
         dateIssued: new Date().toISOString(),
         issuedBy: app.user.name
       });
-      app.showSnackbar('✅ PDF téléchargé avec succès !');
-    } catch (e) {
-      console.error(e);
-      app.showSnackbar('❌ Erreur lors de la génération du PDF');
-    }
+      app.showSnackbar('✅ PDF téléchargé !');
+    } catch (e) { console.error(e); app.showSnackbar('❌ Erreur PDF'); }
+  },
+
+  // --- Tableau de bord Parent ---
+  loadParentDashboard: async () => {
+    const container = document.getElementById('parent-content');
+    try {
+      const snapshot = await db.collection('students').where('parentId', '==', app.user.uid).get();
+      if (snapshot.empty) {
+        container.innerHTML = '<div style="text-align:center; padding:40px; color:var(--on-surface-variant);"><span class="material-icons-round" style="font-size:48px;">child_care</span><p>Aucun enfant inscrit</p></div>';
+        return;
+      }
+
+      let html = '<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">';
+      const children = snapshot.docs.map(d => d.data());
+      const accepted = children.filter(c => c.isAccepted).length;
+      html += `
+        <div class="card" style="text-align:center; background:var(--primary-container); color:#003831;"><div style="font-size:32px; font-weight:700;">${children.length}</div><div class="text-caption" style="color:#004D40;">Inscrits</div></div>
+        <div class="card" style="text-align:center; background:#E8F5E9; color:#2E7D32;"><div style="font-size:32px; font-weight:700;">${accepted}</div><div class="text-caption" style="color:#1B5E20;">Acceptés</div></div>
+      </div>`;
+
+      html += '<div class="text-caption" style="margin:16px 0 8px; font-weight:500; text-transform:uppercase;">Mes enfants</div>';
+      for (const c of children) {
+        const studentDoc = snapshot.docs.find(d => d.data().uniqueCode === c.uniqueCode);
+        const diplomas = await db.collection('diplomas').where('studentId', '==', studentDoc.id).get();
+        const convocations = await db.collection('convocations').where('studentId', '==', studentDoc.id).get();
+
+        html += `
+          <div class="card">
+            <div class="row" style="margin-bottom:12px;">
+              <div style="background:var(--primary); color:white; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold;">${c.firstname[0]}</div>
+              <div class="col flex-1">
+                <div style="font-weight:500;">${c.firstname} ${c.lastname}</div>
+                <div class="text-caption" style="font-family:monospace; color:var(--primary);">${c.uniqueCode}</div>
+              </div>
+              <span class="chip" style="background:${c.isAccepted ? '#E8F5E9' : '#FFEBEE'}; color:${c.isAccepted ? '#2E7D32' : '#C62828'};">${c.isAccepted ? 'Accepté' : 'En attente'}</span>
+            </div>
+            <div class="divider"></div>
+            <div class="row" style="margin-bottom:8px;"><span class="material-icons-round" style="font-size:20px; color:var(--primary);">workspace_premium</span><span style="font-size:14px;">${diplomas.size} diplôme(s)</span></div>
+            <div class="row"><span class="material-icons-round" style="font-size:20px; color:var(--primary);">mail</span><span style="font-size:14px;">${convocations.size} convocation(s)</span></div>
+          </div>
+        `;
+      }
+      container.innerHTML = html;
+    } catch (e) { container.innerHTML = `<div style="color:red; padding:20px;">Erreur: ${e.message}</div>`; }
   }
 };
 
@@ -429,7 +728,7 @@ auth.onAuthStateChanged(async (user) => {
     const doc = await db.collection('users').doc(user.uid).get();
     if (doc.exists) {
       app.user = { uid: user.uid, ...doc.data() };
-      app.navigate('screen-home');
+      app.setupUI();
     }
   } else {
     app.navigate('screen-login');
@@ -437,4 +736,4 @@ auth.onAuthStateChanged(async (user) => {
 });
 </script>
 </body>
-</html>
+                         </html>
